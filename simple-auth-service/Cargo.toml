@@ -1,0 +1,8 @@
+[package]
+name = "simple-auth-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+simple-auth-model = { path = "../simple-auth-model" }
+simple-auth-crud = { path = "../simple-auth-crud" }

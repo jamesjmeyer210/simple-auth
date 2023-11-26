@@ -1,8 +1,8 @@
-[package]
-name = "simple-auth"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+[workspace]
+resolver = "2"
+members = [
+  "simple-auth-web",
+  "simple-auth-service",
+  "simple-auth-crud",
+  "simple-auth-model"
+]
