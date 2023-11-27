@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 simple-auth-model = { path = "../simple-auth-model" }
 simple-auth-service = { path = "../simple-auth-service" }
+actix-web = "4.3.1"
+actix-rt = "2.8.0"

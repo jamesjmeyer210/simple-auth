@@ -1,14 +1,16 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+mod realm;
+mod role;
+mod user;
+mod password;
+mod email;
+mod ip_address;
+mod abs;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// re-exports
+pub use chrono;
+pub use uuid;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub type Realm = realm::Realm;
+pub type Role = role::Role;
+pub type Password = password::Password;
+pub type Email = email::Email;
