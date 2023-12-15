@@ -1,0 +1,9 @@
+[package]
+name = "simple-auth-model"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+uuid = { version = "1.4.1", features = ["serde", "v4"] }
+chrono = { version = "0.4.31", features = ["serde"] }
+lazy-regex = "3.1.0"
