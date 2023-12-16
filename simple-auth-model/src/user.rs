@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
+use crate::contact_info::ContactInfo;
 use crate::email::Email;
 use crate::ip_address::IpAddress;
 use crate::password::Password;
@@ -9,8 +10,9 @@ use crate::role::Role;
 pub struct User {
     pub id: Uuid,
     pub name: String,
-    pub email: Email,
+    //pub email: Email,
     pub password: Password,
+    pub contact_info: Vec<ContactInfo>,
     pub public_key: Vec<u8>,
     pub roles: Vec<Role>,
     pub realms: Vec<Realm>,
@@ -23,7 +25,8 @@ impl Default for User {
         User {
             id: Uuid::new_v4(),
             name: String::from("root"),
-            email: Email::try_from("root@localhost.com").unwrap(),
+            contact_info: vec![],
+            //email: Email::try_from("root@localhost.com").unwrap(),
             password: Password::try_from("password123").unwrap(),
             public_key: Vec::with_capacity(0),
             roles: Vec::with_capacity(0),
