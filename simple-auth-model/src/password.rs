@@ -22,4 +22,8 @@ impl Password {
     pub fn into_inner(self) -> String {
         self._inner
     }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self._inner.as_bytes()
+    }
 }
