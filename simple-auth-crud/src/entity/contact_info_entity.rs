@@ -2,7 +2,7 @@ use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::uuid::Uuid;
-use crate::abs::entity::Entity;
+use crate::abs::Entity;
 
 pub(crate) struct ContactInfoEntity {
     pub user_id: Uuid,

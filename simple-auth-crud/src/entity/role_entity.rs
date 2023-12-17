@@ -1,7 +1,7 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
-use crate::abs::entity::Entity;
+use crate::abs::Entity;
 
 pub(crate) struct RoleEntity {
     pub name: String,

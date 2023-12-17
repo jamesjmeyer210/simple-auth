@@ -2,8 +2,8 @@ use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::uuid::Uuid;
-use crate::abs::entity::Entity;
-use crate::entity::{ContactInfoEntity, PasswordHash};
+use crate::abs::Entity;
+use crate::entity::{PasswordHash};
 
 pub(crate) struct UserEntity {
     pub id: Uuid,
