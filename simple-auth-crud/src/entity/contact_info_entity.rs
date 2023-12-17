@@ -1,3 +1,5 @@
+use sqlx::{Error, FromRow, Row};
+use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::uuid::Uuid;
 use crate::abs::entity::Entity;
@@ -13,7 +15,22 @@ pub(crate) struct ContactInfoEntity {
     pub updated_on: DateTime<Utc>
 }
 
-impl Entity<Vec<u8>> for ContactInfoEntity {
+impl<'r> FromRow<'r, SqliteRow> for ContactInfoEntity {
+    fn from_row(row: &'r SqliteRow) -> Result<Self, Error> {
+        Ok(Self {
+            user_id: row.try_get("user_id")?,
+            label: row.try_get("label")?,
+            unique_id: row.try_get("unique_id")?,
+            enc: row.try_get("enc")?,
+            hash: row.try_get("hash")?,
+            verified: row.try_get("verified")?,
+            created_on: row.try_get("created_on")?,
+            updated_on: row.try_get("updated_on")?,
+        })
+    }
+}
+
+impl <'r>Entity<'r, Vec<u8>> for ContactInfoEntity {
     fn primary_key(&self) -> &Vec<u8> {
         &self.unique_id
     }

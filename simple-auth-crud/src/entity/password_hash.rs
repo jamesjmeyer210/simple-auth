@@ -5,6 +5,10 @@ use argon2::{
     },
     Argon2
 };
+use sqlx::{Database, Decode, Sqlite, Type, Value, ValueRef};
+use sqlx::database::HasValueRef;
+use sqlx::error::BoxDynError;
+use sqlx::sqlite::SqliteTypeInfo;
 
 pub(crate) struct PasswordHash {
     _inner: [u8;32]
@@ -23,6 +27,27 @@ impl TryFrom<Password> for PasswordHash {
         Ok(PasswordHash {
             _inner: bytes
         })
+    }
+}
+
+impl<'r, DB: Database> Decode<'r, DB> for PasswordHash where &'r [u8]: Decode<'r, DB>
+{
+    fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, BoxDynError> {
+        let value = <&[u8] as Decode<DB>>::decode(value)?;
+
+        Ok(PasswordHash {
+            _inner: <[u8;32]>::try_from(value)?
+        })
+    }
+}
+
+impl<DB: Database> Type<DB> for PasswordHash where [u8]: Type<DB> {
+    fn type_info() -> DB::TypeInfo {
+        <[u8]>::type_info()
+    }
+
+    fn compatible(ty: &DB::TypeInfo) -> bool {
+        <[u8]>::compatible(ty)
     }
 }
 
