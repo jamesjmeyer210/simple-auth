@@ -5,10 +5,9 @@ use argon2::{
     },
     Argon2
 };
-use sqlx::{Database, Decode, Sqlite, Type, Value, ValueRef};
+use sqlx::{Database, Decode, Type, Value, ValueRef};
 use sqlx::database::HasValueRef;
 use sqlx::error::BoxDynError;
-use sqlx::sqlite::SqliteTypeInfo;
 
 pub(crate) struct PasswordHash {
     _inner: [u8;32]
