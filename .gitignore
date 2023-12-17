@@ -3,3 +3,6 @@
 
 # cargo output
 /target
+
+# sqlite
+*.sqlite
