@@ -5,4 +5,6 @@ edition = "2021"
 
 [dependencies]
 simple-auth-model = { path = "../simple-auth-model" }
-sqlx = { version = "0.7.2", features = ["sqlite", "runtime-tokio", "macros", "chrono"] }
+sqlx = { version = "0.7.2", features = ["sqlite", "runtime-tokio", "macros", "chrono", "uuid"] }
+argon2 = "0.5.2"
+aes-gcm = "0.10.3"

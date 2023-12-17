@@ -22,7 +22,7 @@ impl<'c, T1, T2> JoinTable<'c, T1, T2>
         T1: FromRow<'c, SqliteRow>,
         T2: FromRow<'c, SqliteRow>,
 {
-    fn new(pool: Arc<SqlitePool>) -> Self {
+    pub fn new(pool: Arc<SqlitePool>) -> Self {
         JoinTable {
             pool,
             _from_row: (T1::from_row, T2::from_row),
