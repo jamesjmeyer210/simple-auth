@@ -11,7 +11,7 @@ pub(crate) struct UserEntity {
     pub password: Option<PasswordHash>,
     pub public_key: Vec<u8>,
     pub created_on: DateTime<Utc>,
-    pub deleted_on: DateTime<Utc>
+    pub deleted_on: Option<DateTime<Utc>>
 }
 
 impl <'r>FromRow<'r, SqliteRow> for UserEntity {
@@ -34,5 +34,9 @@ impl <'r>Entity<'r, Uuid> for UserEntity {
 
     fn created_on(&self) -> &DateTime<Utc> {
         &self.created_on
+    }
+
+    fn is_deleted(&self) -> bool {
+        self.deleted_on.is_some()
     }
 }
