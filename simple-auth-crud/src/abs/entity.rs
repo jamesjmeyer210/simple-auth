@@ -6,4 +6,5 @@ pub(crate) trait Entity<'r, T>: FromRow<'r, SqliteRow>
 {
     fn primary_key(&self) -> &T;
     fn created_on(&self) -> &DateTime<Utc>;
+    fn is_deleted(&self) -> bool;
 }

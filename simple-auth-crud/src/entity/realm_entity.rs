@@ -5,7 +5,8 @@ use crate::abs::Entity;
 
 pub(crate) struct Realm {
     pub name: String,
-    pub created_on: DateTime<Utc>
+    pub created_on: DateTime<Utc>,
+    pub deleted_on: Option<DateTime<Utc>>
 }
 
 impl <'r>FromRow<'r, SqliteRow> for Realm {
@@ -13,6 +14,7 @@ impl <'r>FromRow<'r, SqliteRow> for Realm {
         Ok(Self {
             name: row.try_get("name")?,
             created_on: row.try_get("created_on")?,
+            deleted_on: row.try_get("deleted_on")?
         })
     }
 }
@@ -24,5 +26,9 @@ impl <'r>Entity<'r, String> for Realm {
 
     fn created_on(&self) -> &DateTime<Utc> {
         &self.created_on
+    }
+
+    fn is_deleted(&self) -> bool {
+        self.deleted_on.is_some()
     }
 }

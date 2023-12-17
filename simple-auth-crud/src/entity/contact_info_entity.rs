@@ -12,7 +12,8 @@ pub(crate) struct ContactInfoEntity {
     pub hash: Vec<u8>,
     pub verified: bool,
     pub created_on: DateTime<Utc>,
-    pub updated_on: DateTime<Utc>
+    pub updated_on: DateTime<Utc>,
+    pub deleted_on: Option<DateTime<Utc>>
 }
 
 impl<'r> FromRow<'r, SqliteRow> for ContactInfoEntity {
@@ -26,6 +27,7 @@ impl<'r> FromRow<'r, SqliteRow> for ContactInfoEntity {
             verified: row.try_get("verified")?,
             created_on: row.try_get("created_on")?,
             updated_on: row.try_get("updated_on")?,
+            deleted_on: row.try_get("deleted_on")?,
         })
     }
 }
@@ -37,5 +39,9 @@ impl <'r>Entity<'r, Vec<u8>> for ContactInfoEntity {
 
     fn created_on(&self) -> &DateTime<Utc> {
         &self.created_on
+    }
+
+    fn is_deleted(&self) -> bool {
+        self.deleted_on.is_some()
     }
 }
