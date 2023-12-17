@@ -16,7 +16,7 @@ impl<'c, T> Table<'c, T>
     where
         T: FromRow<'c, SqliteRow>,
 {
-    fn new(pool: Arc<SqlitePool>) -> Self {
+    pub fn new(pool: Arc<SqlitePool>) -> Self {
         Table {
             pool,
             _from_row: T::from_row,
