@@ -10,6 +10,17 @@ pub(crate) struct RoleEntity {
     pub deleted_on: Option<DateTime<Utc>>
 }
 
+impl From<&str> for RoleEntity {
+    fn from(value: &str) -> Self {
+        Self {
+            name: value.to_string(),
+            max: None,
+            created_on: Utc::now(),
+            deleted_on: None
+        }
+    }
+}
+
 impl <'r>FromRow<'r, SqliteRow> for RoleEntity {
     fn from_row(row: &'r SqliteRow) -> Result<Self, Error> {
         Ok(Self {
