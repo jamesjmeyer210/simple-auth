@@ -5,12 +5,20 @@ use argon2::{
     },
     Argon2
 };
-use sqlx::{Database, Decode, Type, Value, ValueRef};
-use sqlx::database::HasValueRef;
+use sqlx::{Database, Decode, Encode, Type, Value, ValueRef};
+use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 
 pub(crate) struct PasswordHash {
     _inner: [u8;32]
+}
+
+// TODO: Implement explicit decode
+impl PasswordHash {
+    pub fn as_bytes(&self) -> &[u8] {
+        self._inner.as_ref()
+    }
 }
 
 impl TryFrom<Password> for PasswordHash {

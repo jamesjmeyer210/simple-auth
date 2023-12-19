@@ -1,6 +1,7 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
+use simple_auth_model::Password;
 use simple_auth_model::uuid::Uuid;
 use crate::abs::Entity;
 use crate::entity::{PasswordHash};
@@ -9,20 +10,34 @@ pub(crate) struct UserEntity {
     pub id: Uuid,
     pub name: String,
     pub password: Option<PasswordHash>,
-    pub public_key: Vec<u8>,
     pub created_on: DateTime<Utc>,
     pub deleted_on: Option<DateTime<Utc>>
+}
+
+impl Default for UserEntity {
+    fn default() -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            name: String::from("root"),
+            password: Password::try_from("password123")
+                .map(|p|PasswordHash::try_from(p))
+                .unwrap()
+                .map(|h|Some(h))
+                .unwrap(),
+            created_on: Utc::now(),
+            deleted_on: None,
+        }
+    }
 }
 
 impl <'r>FromRow<'r, SqliteRow> for UserEntity {
     fn from_row(row: &'r SqliteRow) -> Result<Self, Error> {
         Ok(Self {
-            id: row.try_get("id")?,
-            name: row.try_get("name")?,
-            password: row.try_get("password")?,
-            public_key: row.try_get("public_key")?,
-            created_on: row.try_get("created_on")?,
-            deleted_on: row.try_get("updated_on")?,
+            id: row.try_get(0)?,
+            name: row.try_get(1)?,
+            password: row.try_get(2)?,
+            created_on: row.try_get(3)?,
+            deleted_on: row.try_get(4)?,
         })
     }
 }
