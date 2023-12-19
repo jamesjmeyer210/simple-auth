@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use sqlx::migrate::MigrateError;
+use sqlx::migrate::{MigrateError};
 use sqlx::SqlitePool;
 use sqlx::types::Uuid;
 use crate::abs::table::Table;
@@ -31,6 +31,12 @@ impl<'r> DbContext<'r> {
         sqlx::migrate!("../migrations")
             .run(&*self._pool)
             .await
+    }
+
+    pub(crate) async fn in_memory() -> Result<Self, sqlx::Error> {
+        let db = Self::new("sqlite::memory:").await?;
+        db.migrate().await.expect("migration failed");
+        Ok(db)
     }
 }
 
