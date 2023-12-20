@@ -1,6 +1,7 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
+use simple_auth_model::Realm;
 use crate::abs::Entity;
 
 #[derive(Debug)]
@@ -8,6 +9,17 @@ pub(crate) struct RealmEntity {
     pub name: String,
     pub created_on: DateTime<Utc>,
     pub deleted_on: Option<DateTime<Utc>>
+}
+
+impl Into<Realm> for RealmEntity {
+    fn into(self) -> Realm {
+        Realm {
+            name: self.name,
+            created_on: self.created_on,
+            roles: Vec::with_capacity(0),
+            users: Vec::with_capacity(0)
+        }
+    }
 }
 
 impl From<&str> for RealmEntity {
