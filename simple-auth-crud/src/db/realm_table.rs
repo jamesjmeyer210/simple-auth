@@ -23,6 +23,17 @@ impl<'r> Table<'r, RealmEntity, String> {
             .map(|x: Count|x.into())
     }
 
+    pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
+        sqlx::query_as(r#"
+            SELECT COUNT(*) FROM `realms` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#)
+            .bind(name)
+            .fetch_one(&*self.pool)
+            .await
+            .map(|x: Count|x.into())
+    }
+
     pub async fn all(&self) -> Result<Vec<RealmEntity>, sqlx::Error> {
         sqlx::query_as(
             r#"

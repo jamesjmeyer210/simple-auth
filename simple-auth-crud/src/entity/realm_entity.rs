@@ -11,13 +11,13 @@ pub(crate) struct RealmEntity {
     pub deleted_on: Option<DateTime<Utc>>
 }
 
-impl Into<Realm> for RealmEntity {
-    fn into(self) -> Realm {
-        Realm {
-            name: self.name,
-            created_on: self.created_on,
+impl From<RealmEntity> for Realm {
+    fn from(value: RealmEntity) -> Self {
+        Self {
+            name: value.name,
+            created_on: value.created_on,
             roles: Vec::with_capacity(0),
-            users: Vec::with_capacity(0)
+            users: Vec::with_capacity(0),
         }
     }
 }
