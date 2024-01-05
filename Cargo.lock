@@ -1648,21 +1648,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "simple-auth-service"
-version = "0.1.0"
-dependencies = [
- "simple-auth-crud",
- "simple-auth-model",
-]
-
-[[package]]
 name = "simple-auth-web"
 version = "0.1.0"
 dependencies = [
  "actix-rt",
  "actix-web",
+ "simple-auth-crud",
  "simple-auth-model",
- "simple-auth-service",
 ]
 
 [[package]]

@@ -1,4 +1,9 @@
 mod abs;
 mod entity;
 mod db;
-mod crud;
+pub mod crud;
+
+// Re-exports
+pub use sqlx;
+
+pub type DbContext<'r> = db::DbContext<'r>;

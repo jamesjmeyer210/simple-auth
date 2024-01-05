@@ -3,10 +3,8 @@ name = "simple-auth-web"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 simple-auth-model = { path = "../simple-auth-model" }
-simple-auth-service = { path = "../simple-auth-service" }
+simple-auth-crud = { path = "../simple-auth-crud" }
 actix-web = "4.3.1"
 actix-rt = "2.8.0"
