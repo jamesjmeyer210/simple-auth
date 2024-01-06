@@ -17,7 +17,7 @@ impl <'r>From<&DbContext<'r>> for RealmCrud<'r> {
 }
 
 impl <'r>RealmCrud<'r> {
-    async fn add(&self, realm: &str) -> Result<Realm,sqlx::Error> {
+    pub async fn add(&self, realm: &str) -> Result<Realm,sqlx::Error> {
         let entity = RealmEntity::from(realm);
         let _ = self._realms.add(&entity).await?;
         Ok(entity.into())
@@ -31,7 +31,7 @@ impl <'r>RealmCrud<'r> {
             .collect()
     }
 
-    async fn contains(&self, realm: &str) -> Result<bool,sqlx::Error> {
+    pub async fn contains(&self, realm: &str) -> Result<bool,sqlx::Error> {
         self._realms.count_by_name(realm)
             .await
             .map(|x|x == 1)

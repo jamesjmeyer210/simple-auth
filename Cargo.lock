@@ -1644,6 +1644,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "lazy-regex",
+ "log",
  "uuid",
 ]
 
@@ -1653,6 +1654,7 @@ version = "0.1.0"
 dependencies = [
  "actix-rt",
  "actix-web",
+ "log",
  "simple-auth-crud",
  "simple-auth-model",
 ]

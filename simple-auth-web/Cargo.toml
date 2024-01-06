@@ -8,3 +8,4 @@ simple-auth-model = { path = "../simple-auth-model" }
 simple-auth-crud = { path = "../simple-auth-crud" }
 actix-web = "4.3.1"
 actix-rt = "2.8.0"
+log = "0.4.20"
