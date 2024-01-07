@@ -17,7 +17,7 @@ impl <'a>From<&'a ServiceProvider> for RealmService {
 }
 
 impl RealmService {
-    pub(crate) async fn add_default(&self) -> Result<(),ServiceError> {
+    pub async fn add_default(&self) -> Result<(),ServiceError> {
         let realm = "master";
 
         let exists = self._crud.contains(realm)

@@ -11,6 +11,7 @@ mod error;
 // re-exports
 pub use chrono;
 pub use uuid;
+pub use log4rs;
 
 pub type Realm = realm::Realm;
 pub type Role = role::Role;
