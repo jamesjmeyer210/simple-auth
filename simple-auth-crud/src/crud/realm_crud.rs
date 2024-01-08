@@ -5,7 +5,7 @@ use crate::db::DbContext;
 use crate::entity::RealmEntity;
 
 pub struct RealmCrud<'r> {
-    _realms: Arc<Table<'r, RealmEntity, String>>,
+    _realms: Arc<Table<'r, RealmEntity>>,
 }
 
 impl <'r>From<&DbContext<'r>> for RealmCrud<'r> {

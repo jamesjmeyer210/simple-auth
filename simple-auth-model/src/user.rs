@@ -7,6 +7,7 @@ use crate::password::Password;
 use crate::realm::Realm;
 use crate::role::Role;
 
+#[derive(Debug)]
 pub struct User {
     pub id: Uuid,
     pub name: String,

@@ -1,6 +1,7 @@
 use lazy_regex::regex_is_match;
 use crate::abs::IsValid;
 
+#[derive(Debug)]
 pub struct Email {
     _inner: String,
 }

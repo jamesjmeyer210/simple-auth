@@ -3,14 +3,16 @@ use std::sync::Arc;
 use sqlx::migrate::{MigrateError};
 use sqlx::SqlitePool;
 use sqlx::types::Uuid;
+use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
 
 pub struct DbContext<'r> {
-    pub(crate) realms: Arc<Table<'r, RealmEntity, String>>,
-    pub(crate) roles: Arc<Table<'r, RoleEntity, String>>,
-    pub(crate) users: Arc<Table<'r, UserEntity, Uuid>>,
-    pub(crate) user_contacts: Arc<Table<'r, ContactInfoEntity, Vec<u8>>>,
+    pub(crate) realms: Arc<Table<'r, RealmEntity>>,
+    pub(crate) roles: Arc<Table<'r, RoleEntity>>,
+    pub(crate) roles_to_realms: Arc<JoinTable<'r, RoleEntity, RealmEntity>>,
+    pub(crate) users: Arc<Table<'r, UserEntity>>,
+    pub(crate) user_contacts: Arc<Table<'r, ContactInfoEntity>>,
     _pool: Arc<SqlitePool>
 }
 
@@ -22,6 +24,7 @@ impl<'r> DbContext<'r> {
         Ok(Self {
             realms: Arc::from(Table::new(pool.clone())),
             roles: Arc::new(Table::new(pool.clone())),
+            roles_to_realms: Arc::new(JoinTable::new(pool.clone())),
             users: Arc::new(Table::new(pool.clone())),
             user_contacts: Arc::new(Table::new(pool.clone())),
             _pool: pool,

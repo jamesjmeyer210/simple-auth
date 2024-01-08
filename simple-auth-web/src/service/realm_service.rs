@@ -1,5 +1,6 @@
 use simple_auth_crud::crud::RealmCrud;
 use simple_auth_crud::DbContext;
+use simple_auth_model::Realm;
 use crate::di::ServiceProvider;
 use crate::error::ServiceError;
 
@@ -17,24 +18,24 @@ impl <'a>From<&'a ServiceProvider> for RealmService {
 }
 
 impl RealmService {
-    pub async fn add_default(&self) -> Result<(),ServiceError> {
-        let realm = "master";
+    pub async fn add_default(&self) -> Result<Realm,ServiceError> {
+        let realm = Realm::default();
 
-        let exists = self._crud.contains(realm)
+        let exists = self._crud.contains(&realm.name)
             .await
             .map_err(|e|ServiceError::from(e))?;
 
         if exists {
-            log::debug!("{} exists", realm);
-            return Ok(());
+            log::debug!("Default realm {} exists", &realm.name);
+            return Ok(realm);
         }
 
-        let x = self._crud.add(realm)
+        let realm = self._crud.add(&realm.name)
             .await
             .map_err(|e|ServiceError::from(e))?;
 
-        log::debug!("added {} realm", &x.name);
-        Ok(())
+        log::debug!("Added default realm {}", &realm.name);
+        Ok(realm)
     }
 }
 

@@ -1757,6 +1757,7 @@ version = "0.1.0"
 dependencies = [
  "aes-gcm",
  "argon2",
+ "log",
  "simple-auth-model",
  "sqlx",
 ]

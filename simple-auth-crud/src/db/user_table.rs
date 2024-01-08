@@ -2,7 +2,7 @@ use sqlx::types::Uuid;
 use crate::abs::table::Table;
 use crate::entity::UserEntity;
 
-impl<'r> Table<'r, UserEntity, Uuid> {
+impl<'r> Table<'r, UserEntity> {
     pub async fn add(&self, model: &UserEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"

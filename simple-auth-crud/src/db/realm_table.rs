@@ -1,7 +1,7 @@
 use crate::abs::table::Table;
 use crate::entity::{Count, RealmEntity};
 
-impl<'r> Table<'r, RealmEntity, String> {
+impl<'r> Table<'r, RealmEntity> {
     pub async fn add(&self, model: &RealmEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"

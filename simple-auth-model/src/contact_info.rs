@@ -1,5 +1,6 @@
 use crate::Email;
 
+#[derive(Debug)]
 pub struct ContactInfo {
     pub verified: bool,
     pub label: String,
@@ -16,6 +17,7 @@ impl Default for ContactInfo {
     }
 }
 
+#[derive(Debug)]
 pub enum ContactValue {
     Email(Email),
     Other(String)

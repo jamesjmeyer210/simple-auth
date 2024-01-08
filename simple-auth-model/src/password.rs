@@ -1,4 +1,6 @@
 
+// TODO: implement custom Debug that protects the password
+#[derive(Debug)]
 pub struct Password {
     _inner: String,
 }

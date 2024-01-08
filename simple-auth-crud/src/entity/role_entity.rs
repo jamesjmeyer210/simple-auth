@@ -1,6 +1,7 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
+use simple_auth_model::Role;
 use crate::abs::Entity;
 
 pub(crate) struct RoleEntity {
@@ -17,6 +18,17 @@ impl From<&str> for RoleEntity {
             max: None,
             created_on: Utc::now(),
             deleted_on: None
+        }
+    }
+}
+
+impl From<&Role> for RoleEntity {
+    fn from(value: &Role) -> Self {
+        Self {
+            name: value.name.clone(),
+            max: value.max,
+            created_on: value.created_on,
+            deleted_on: None,
         }
     }
 }
