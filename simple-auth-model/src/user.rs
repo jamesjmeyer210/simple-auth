@@ -36,6 +36,23 @@ impl Default for User {
     }
 }
 
+impl User {
+    pub fn with_realm(mut self, realm: Realm) -> Self {
+        self.realms.push(realm);
+        self
+    }
+
+    pub fn with_role(mut self, role: Role) -> Self {
+        self.roles.push(role);
+        self
+    }
+
+    pub fn with_contact_info(mut self, contact_info: ContactInfo) -> Self {
+        self.contact_info.push(contact_info);
+        self
+    }
+}
+
 pub enum UserEventKind {
     Created,
     Deleted,
