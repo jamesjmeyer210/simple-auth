@@ -1,4 +1,3 @@
-use sqlx::types::Uuid;
 use crate::abs::table::Table;
 use crate::entity::{Count, UserEntity};
 

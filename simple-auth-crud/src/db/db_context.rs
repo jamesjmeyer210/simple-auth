@@ -13,6 +13,8 @@ pub struct DbContext<'r> {
     pub(crate) roles_to_realms: Arc<JoinTable<'r, RoleEntity, RealmEntity>>,
     pub(crate) users: Arc<Table<'r, UserEntity>>,
     pub(crate) user_contacts: Arc<Table<'r, ContactInfoEntity>>,
+    pub(crate) users_to_realms: Arc<JoinTable<'r, UserEntity, RealmEntity>>,
+    pub(crate) users_to_roles: Arc<JoinTable<'r, UserEntity, RoleEntity>>,
     _pool: Arc<SqlitePool>
 }
 
@@ -27,6 +29,8 @@ impl<'r> DbContext<'r> {
             roles_to_realms: Arc::new(JoinTable::new(pool.clone())),
             users: Arc::new(Table::new(pool.clone())),
             user_contacts: Arc::new(Table::new(pool.clone())),
+            users_to_realms: Arc::new(JoinTable::new(pool.clone())),
+            users_to_roles: Arc::new(JoinTable::new(pool.clone())),
             _pool: pool,
         })
     }
