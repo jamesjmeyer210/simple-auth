@@ -1,3 +1,4 @@
+use crate::abs::AsBytes;
 use crate::Email;
 
 #[derive(Debug)]
@@ -21,4 +22,13 @@ impl Default for ContactInfo {
 pub enum ContactValue {
     Email(Email),
     Other(String)
+}
+
+impl AsBytes for ContactValue {
+    fn as_bytes(&self) -> &[u8] {
+        match self {
+            Self::Email(x) => x.as_bytes(),
+            Self::Other(x) => x.as_bytes()
+        }
+    }
 }

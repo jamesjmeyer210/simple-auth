@@ -4,7 +4,7 @@ mod user;
 mod password;
 mod email;
 mod ip_address;
-mod abs;
+pub mod abs;
 mod contact_info;
 mod error;
 

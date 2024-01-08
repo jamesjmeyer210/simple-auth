@@ -1,4 +1,5 @@
 use simple_auth_model::Password;
+use simple_auth_model::abs::AsBytes;
 use argon2::{
     password_hash::{
         rand_core::{OsRng, RngCore}
@@ -7,7 +8,6 @@ use argon2::{
 };
 use sqlx::{Database, Decode, Encode, Type, Value, ValueRef};
 use sqlx::database::{HasArguments, HasValueRef};
-use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 
 pub(crate) struct PasswordHash {
