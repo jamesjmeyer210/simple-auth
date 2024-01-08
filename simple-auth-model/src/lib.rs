@@ -15,6 +15,7 @@ pub use log4rs;
 
 pub type Realm = realm::Realm;
 pub type Role = role::Role;
+pub type User = user::User;
 pub type Password = password::Password;
 pub type Email = email::Email;
 pub type ContactInfo = contact_info::ContactInfo;

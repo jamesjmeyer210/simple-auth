@@ -1,7 +1,7 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
-use simple_auth_model::Password;
+use simple_auth_model::{Password, User};
 use simple_auth_model::uuid::Uuid;
 use crate::abs::Entity;
 use crate::entity::{PasswordHash};
@@ -11,7 +11,7 @@ pub(crate) struct UserEntity {
     pub name: String,
     pub password: Option<PasswordHash>,
     pub created_on: DateTime<Utc>,
-    pub deleted_on: Option<DateTime<Utc>>
+    pub deleted_on: Option<DateTime<Utc>>,
 }
 
 impl Default for UserEntity {
@@ -20,12 +20,24 @@ impl Default for UserEntity {
             id: Uuid::new_v4(),
             name: String::from("root"),
             password: Password::try_from("password123")
-                .map(|p|PasswordHash::try_from(p))
+                .map(|p|PasswordHash::try_from(&p))
                 .unwrap()
                 .map(|h|Some(h))
                 .unwrap(),
             created_on: Utc::now(),
-            deleted_on: None,
+            deleted_on: None
+        }
+    }
+}
+
+impl From<&User> for UserEntity {
+    fn from(value: &User) -> Self {
+        Self {
+            id: value.id,
+            name: value.name.clone(),
+            password: PasswordHash::try_from(&value.password).ok(),
+            created_on: value.created_on,
+            deleted_on: value.deleted_on
         }
     }
 }
