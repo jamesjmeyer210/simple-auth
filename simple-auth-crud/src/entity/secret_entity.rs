@@ -17,3 +17,13 @@ impl <'r>FromRow<'r, SqliteRow> for SecretEntity {
         })
     }
 }
+
+impl SecretEntity {
+    pub fn new(key: &str, value_enc: Vec<u8>) -> Self {
+        Self {
+            key: key.to_string(),
+            value_enc,
+            expires_on: None,
+        }
+    }
+}

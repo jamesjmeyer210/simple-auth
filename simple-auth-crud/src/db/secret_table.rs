@@ -16,12 +16,12 @@ impl <'r>Table<'r, SecretEntity> {
             .map(|x|x.rows_affected())
     }
 
-    pub async fn count_by_key(&self, key: &str) -> Result<u32,sqlx::Error> {
+    pub async fn contains(&self, key: &str) -> Result<bool,sqlx::Error> {
         sqlx::query_as("SELECT COUNT(*) FROM `secrets` as `a` WHERE `a`.`key` = ?")
             .bind(key)
             .fetch_one(&*self.pool)
             .await
-            .map(|x: Count|x.into())
+            .map(|x: Count|<Count as Into<u32>>::into(x) == 1)
     }
 
     pub async fn get(&self, key: &str) -> Result<SecretEntity,sqlx::Error> {

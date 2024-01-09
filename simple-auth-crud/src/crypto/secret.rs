@@ -3,6 +3,7 @@ use aes_gcm::aead::OsRng;
 use aes_gcm::{Aes256Gcm, KeyInit};
 use sha2::{Sha256, Digest};
 use sha2::digest::{DynDigest, FixedOutput};
+use simple_auth_model::abs::AsBytes;
 use crate::crypto::AsHash;
 use crate::crypto::sha_256_hash::Sha256Hash;
 
@@ -22,6 +23,12 @@ impl Default for Secret {
 impl AsHash<Sha256Hash> for Secret {
     fn as_hash(&self) -> Sha256Hash {
         Sha256Hash::from(self._key.as_ref())
+    }
+}
+
+impl AsBytes for Secret {
+    fn as_bytes(&self) -> &[u8] {
+        self._key.as_ref()
     }
 }
 

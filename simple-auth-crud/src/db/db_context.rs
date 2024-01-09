@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 use sqlx::types::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
-use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
+use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, SecretEntity, UserEntity};
 
 pub struct DbContext<'r> {
     pub(crate) realms: Arc<Table<'r, RealmEntity>>,
@@ -15,6 +15,7 @@ pub struct DbContext<'r> {
     pub(crate) user_contacts: Arc<Table<'r, ContactInfoEntity>>,
     pub(crate) users_to_realms: Arc<JoinTable<'r, UserEntity, RealmEntity>>,
     pub(crate) users_to_roles: Arc<JoinTable<'r, UserEntity, RoleEntity>>,
+    pub(crate) secrets: Arc<Table<'r, SecretEntity>>,
     _pool: Arc<SqlitePool>
 }
 
@@ -31,6 +32,7 @@ impl<'r> DbContext<'r> {
             user_contacts: Arc::new(Table::new(pool.clone())),
             users_to_realms: Arc::new(JoinTable::new(pool.clone())),
             users_to_roles: Arc::new(JoinTable::new(pool.clone())),
+            secrets: Arc::new(Table::new(pool.clone())),
             _pool: pool,
         })
     }
