@@ -1758,6 +1758,7 @@ dependencies = [
  "aes-gcm",
  "argon2",
  "log",
+ "sha2",
  "simple-auth-model",
  "sqlx",
 ]

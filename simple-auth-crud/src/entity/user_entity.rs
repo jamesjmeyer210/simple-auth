@@ -3,7 +3,6 @@ use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::{Password, User};
 use simple_auth_model::uuid::Uuid;
-use crate::abs::Entity;
 use crate::entity::{PasswordHash};
 
 pub(crate) struct UserEntity {
@@ -51,19 +50,5 @@ impl <'r>FromRow<'r, SqliteRow> for UserEntity {
             created_on: row.try_get(3)?,
             deleted_on: row.try_get(4)?,
         })
-    }
-}
-
-impl <'r>Entity<'r, Uuid> for UserEntity {
-    fn primary_key(&self) -> &Uuid {
-        &self.id
-    }
-
-    fn created_on(&self) -> &DateTime<Utc> {
-        &self.created_on
-    }
-
-    fn is_deleted(&self) -> bool {
-        self.deleted_on.is_some()
     }
 }

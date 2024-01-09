@@ -2,6 +2,7 @@ mod abs;
 mod entity;
 mod db;
 pub mod crud;
+mod crypto;
 
 // Re-exports
 pub use sqlx;

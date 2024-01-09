@@ -122,3 +122,10 @@ create table if not exists `users_contact_info` (
         references users(`id`)
         on delete cascade
 );
+
+drop table if exists `secrets`;
+create table if not exists `secrets` (
+    `key` text primary key not null,
+    `value_enc` blob not null,
+    `expires_on` text,
+);
