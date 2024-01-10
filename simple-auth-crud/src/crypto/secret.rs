@@ -32,6 +32,10 @@ impl AsBytes for Secret {
     }
 }
 
+/*impl Encrypt<Aes256Gcm> for Secret {
+    type Output = Encrypted<Aes256Gcm>;
+}*/
+
 #[cfg(test)]
 mod test {
     use crate::crypto::{AsHash, Hash};

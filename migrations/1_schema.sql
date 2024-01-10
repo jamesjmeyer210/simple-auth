@@ -127,5 +127,5 @@ drop table if exists `secrets`;
 create table if not exists `secrets` (
     `key` text primary key not null,
     `value_enc` blob not null,
-    `expires_on` text,
+    `expires_on` text
 );
