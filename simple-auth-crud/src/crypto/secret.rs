@@ -20,6 +20,16 @@ impl Default for Secret {
     }
 }
 
+impl TryFrom<Vec<u8>> for Secret {
+    type Error = Vec<u8>;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            _key: value.try_into()?
+        })
+    }
+}
+
 impl AsHash<Sha256Hash> for Secret {
     fn as_hash(&self) -> Sha256Hash {
         Sha256Hash::from(self._key.as_ref())
@@ -32,12 +42,9 @@ impl AsBytes for Secret {
     }
 }
 
-/*impl Encrypt<Aes256Gcm> for Secret {
-    type Output = Encrypted<Aes256Gcm>;
-}*/
-
 #[cfg(test)]
 mod test {
+    use simple_auth_model::abs::AsBytes;
     use crate::crypto::{AsHash, Hash};
     use super::Secret;
 
@@ -46,5 +53,22 @@ mod test {
         let s = Secret::default();
         let h = s.as_hash();
         assert_eq!(32, h.len());
+    }
+
+    #[test]
+    fn try_from_returns_err() {
+        let vec = vec![1,2,3];
+
+        let x = Secret::try_from(vec);
+        assert!(x.is_err());
+    }
+
+    #[test]
+    fn try_from_returns_ok() {
+        let s = Secret::default();
+        let vec = s.as_bytes().to_vec();
+
+        let x = Secret::try_from(vec);
+        assert!(x.is_ok());
     }
 }

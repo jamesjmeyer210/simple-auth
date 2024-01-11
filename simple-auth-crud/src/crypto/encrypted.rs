@@ -54,7 +54,7 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
     }
 
     pub fn decrypt<D>(&self, key: &Secret) -> Result<D,DecryptionError>
-        where D : From<Vec<u8>>
+        where D : TryFrom<Vec<u8>>
     {
         let cipher = T::new_from_slice(key.as_bytes())
             .map_err(|e|DecryptionError::InvalidLength(e))?;
@@ -62,7 +62,7 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
         let x = cipher.decrypt(&self.nonce, self.bytes.as_ref())
             .map_err(|e|DecryptionError::DecryptionFailed)?;
 
-        Ok(D::from(x))
+        Ok(D::try_from(x).map_err(|_|DecryptionError::DecryptionFailed)?)
     }
 }
 

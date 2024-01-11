@@ -1,12 +1,13 @@
 use std::fs;
 use std::sync::Arc;
 use aes_gcm::{
-    aead::{AeadCore, OsRng, AeadInPlace, KeyInit, heapless::Vec},
-    Aes256Gcm, Nonce
+    aead::{KeyInit},
+    Aes256Gcm
 };
 use aes_gcm::aead::Aead;
 use simple_auth_model::abs::AsBytes;
 use crate::abs::table::Table;
+use crate::crypto::encrypted::{encrypt, Encrypted};
 use crate::crypto::secret::Secret;
 use crate::DbContext;
 use crate::entity::SecretEntity;
@@ -41,10 +42,18 @@ impl SecretStore {
     fn enc_key(&self) -> &Secret {
         &self._inner._enc_key
     }
+
+    fn set_enc_key(&mut self, secret: Secret) -> () {
+        self._inner._enc_key = secret;
+    }
+
+    fn set_sig_key(&mut self, secret: Secret) -> () {
+        self._inner._sig_key = secret;
+    }
 }
 
 pub(crate) struct SecretStoreBuilder<'r> {
-    _secrets: Arc<Table<'r, SecretEntity>>
+    _secrets: Arc<Table<'r, SecretEntity>>,
 }
 
 impl <'r>From<&DbContext<'r>> for SecretStoreBuilder<'r> {
@@ -60,27 +69,48 @@ impl <'r>SecretStoreBuilder<'r> {
         let mut store = SecretStore::default();
 
         if !self._secrets.contains("enc_key").await? {
-            fs::write("enc_key",  store._inner._enc_key.as_bytes()).unwrap();
+            fs::write("enc_key",  store.enc_key().as_bytes()).unwrap();
             log::debug!("Wrote encryption key to \"enc_key\"");
 
-            let cipher = Aes256Gcm::new_from_slice(store.enc_key().as_bytes()).unwrap();
-            let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+            let encrypted = encrypt::<Aes256Gcm>(store.enc_key().as_bytes(), store.enc_key()).unwrap();
 
-            let enc = cipher.encrypt(&nonce, store.enc_key().as_bytes()).unwrap();
-            let _ = self._secrets.add(SecretEntity::new("enc_key", enc)).await?;
+            let _ = self._secrets.add(SecretEntity::new("enc_key", encrypted.into())).await?;
             log::debug!("Added enc_key to database");
         }
         else {
             let model = self._secrets.get("enc_key").await?;
+            let encrypted = Encrypted::<Aes256Gcm>::try_from(model.value_enc).unwrap();
+
             let key = fs::read("enc_key").unwrap();
-            let nonce = &model.value_enc[0..98];
+            let encrypted_key = Secret::try_from(key).unwrap();
 
-            let cipher = Aes256Gcm::new_from_slice(key.as_slice()).unwrap();
-            let nonce = Nonce::from_slice(nonce);
-            let enc_key = cipher.decrypt(nonce, &*model.value_enc).unwrap();
+            let decrypted_secret = encrypted.decrypt::<Secret>(&encrypted_key).unwrap();
 
+            store.set_enc_key(decrypted_secret);
+        }
+
+        if self._secrets.contains("sig_key").await? {
+            let sig_key_enc = self._secrets.get("sig_key").await?;
+            let encrypted = Encrypted::<Aes256Gcm>::try_from(sig_key_enc.value_enc).unwrap();
+            let sig_key = encrypted.decrypt::<Secret>(store.enc_key()).unwrap();
+            store.set_sig_key(sig_key);
         }
 
         Ok(store)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::DbContext;
+    use super::SecretStoreBuilder;
+
+    #[sqlx::test]
+    async  fn build_returns_ok() {
+        let db = DbContext::in_memory().await.unwrap();
+        let builder: SecretStoreBuilder = (&db).into();
+
+        let store = builder.build().await;
+        assert!(store.is_ok());
     }
 }
