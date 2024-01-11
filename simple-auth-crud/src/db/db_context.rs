@@ -1,7 +1,6 @@
 use std::any::{Any};
 use std::sync::Arc;
 use sqlx::migrate::{MigrateError};
-use sqlx::sqlite::SqliteError;
 use sqlx::SqlitePool;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;

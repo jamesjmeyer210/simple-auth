@@ -26,7 +26,7 @@ impl Default for SecretStoreInner {
     }
 }
 
-pub(crate) struct SecretStore {
+pub struct SecretStore {
     _inner: Box<SecretStoreInner>
 }
 

@@ -7,7 +7,8 @@ mod encrypted;
 mod encryption_error;
 
 pub type EncryptionError = encryption_error::EncryptionError;
-pub(crate) type SecretStore = secret_store::SecretStore;
+pub type SecretStore = secret_store::SecretStore;
+pub type Secret = secret::Secret;
 pub(crate) type SecretStoreBuilder<'r> = secret_store::SecretStoreBuilder<'r>;
 
 pub trait Hash : AsBytes {

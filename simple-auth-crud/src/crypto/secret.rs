@@ -7,7 +7,7 @@ use simple_auth_model::abs::AsBytes;
 use crate::crypto::AsHash;
 use crate::crypto::sha_256_hash::Sha256Hash;
 
-pub(crate) struct Secret {
+pub struct Secret {
     _key: [u8;32]
 }
 

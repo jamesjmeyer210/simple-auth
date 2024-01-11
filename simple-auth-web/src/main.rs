@@ -25,8 +25,17 @@ async fn main() {
 
     let db = DbContext::in_memory().await.unwrap();
 
+    let secret_store = (&db).get_secret_store().await;
+    if secret_store.is_err() {
+        log::error!("Failed to load secrets");
+        return;
+    }
+    let secret_store = secret_store.unwrap();
+    log::info!("Loaded secrets");
+
     let mut services = ServiceCollection::new();
     services.add(db);
+    services.add(secret_store);
 
     let provider = services.build_provider();
 
