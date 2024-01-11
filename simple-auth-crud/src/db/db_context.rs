@@ -1,10 +1,11 @@
-use std::any::{Any, TypeId};
+use std::any::{Any};
 use std::sync::Arc;
 use sqlx::migrate::{MigrateError};
+use sqlx::sqlite::SqliteError;
 use sqlx::SqlitePool;
-use sqlx::types::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
+use crate::crypto::{SecretStore, SecretStoreBuilder};
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, SecretEntity, UserEntity};
 
 pub struct DbContext<'r> {
@@ -52,6 +53,11 @@ impl<'r> DbContext<'r> {
     pub fn get_crud<T: for<'a> From<&'a DbContext<'r>>>(&self) -> T {
         T::from(self)
     }
+
+    pub async fn get_secret_store(&self) -> Result<SecretStore,sqlx::Error> {
+        let builder: SecretStoreBuilder = self.into();
+        builder.build().await
+    }
 }
 
 #[cfg(test)]
@@ -82,5 +88,12 @@ mod test {
         let db = db.unwrap();
 
         let crud = db.get_crud::<RealmCrud>();
+    }
+
+    #[sqlx::test]
+    async fn get_secret_store_returns_ok() {
+        let db = DbContext::in_memory().await.unwrap();
+        let store = db.get_secret_store().await;
+        assert!(store.is_ok());
     }
 }
