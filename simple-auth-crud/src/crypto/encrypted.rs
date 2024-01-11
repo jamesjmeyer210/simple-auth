@@ -1,7 +1,9 @@
-use std::marker::PhantomData;
-use aes_gcm::{AeadCore, AeadInPlace, Aes256Gcm, KeyInit, KeySizeUser, TagSize};
+use std::fmt::{Debug, Formatter};
+use std::io::Read;
+use std::mem::size_of;
+use aes_gcm::{AeadCore, AeadInPlace, KeyInit, KeySizeUser, TagSize};
 use aes_gcm::aead::{Aead, OsRng, Nonce};
-use aes_gcm::aes::cipher::ArrayLength;
+use aes_gcm::aes::cipher::{ArrayLength, InvalidLength};
 use simple_auth_model::abs::AsBytes;
 use crate::crypto::encryption_error::DecryptionError;
 use crate::crypto::EncryptionError;
@@ -9,27 +11,47 @@ use crate::crypto::secret::Secret;
 
 pub struct Encrypted<T: KeyInit + AeadCore + AeadInPlace> {
     bytes: Vec<u8>,
-    nonce: Nonce<T>,
-    _marker: PhantomData<T>
+    nonce: Nonce<T>
+}
+
+impl <T>Clone for Encrypted<T>
+    where T: KeyInit + AeadCore + AeadInPlace
+{
+    fn clone(&self) -> Self {
+        let bytes = self.bytes.clone();
+        let nonce = Nonce::<T>::clone_from_slice(self.nonce.as_slice());
+        Self::new(bytes, nonce)
+    }
+}
+
+impl <T>Debug for Encrypted<T>
+    where T: KeyInit + AeadCore + AeadInPlace
+{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "bytes: {:?}", &self.bytes)?;
+        writeln!(f, "nonce: {:?}", &self.nonce.as_slice())
+    }
+}
+
+impl <T>PartialEq for Encrypted<T>
+    where T: KeyInit + AeadCore + AeadInPlace
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.bytes.eq(&other.bytes) && self.nonce.as_slice().eq(other.nonce.as_slice())
+    }
 }
 
 impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
-    pub fn new(bytes: Vec<u8>, nonce: Nonce<T>) -> Self {
+    fn new(bytes: Vec<u8>, nonce: Nonce<T>) -> Self {
         Self {
             bytes,
             nonce,
-            _marker: Default::default(),
         }
     }
 
     pub fn len(&self) -> usize {
-        self.bytes.len()
+        self.nonce.len() + self.bytes.len()
     }
-
-    /*fn get_data(&self) -> &[u8] {
-        let l = self.bytes.len();
-        self.bytes[self.nonce_size..l].as_ref()
-    }*/
 
     pub fn decrypt<D>(&self, key: &Secret) -> Result<D,DecryptionError>
         where D : From<Vec<u8>>
@@ -37,10 +59,6 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
         let cipher = T::new_from_slice(key.as_bytes())
             .map_err(|e|DecryptionError::InvalidLength(e))?;
 
-        /*let nonce = Nonce::<T>::from_slice(self.bytes[0..self.nonce_size].as_ref());
-        let x = cipher.decrypt(nonce, key.as_bytes())
-            .map_err(|e|DecryptionError::DecryptionFailed)?;
-         */
         let x = cipher.decrypt(&self.nonce, self.bytes.as_ref())
             .map_err(|e|DecryptionError::DecryptionFailed)?;
 
@@ -48,14 +66,54 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
     }
 }
 
-/*impl <T>From<Vec<u8>> for Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
-    fn from(value: Vec<u8>) -> Self {
-        Self {
-            bytes: value,
-            _marker: Default::default()
+impl <T>Into<Vec<u8>> for Encrypted<T>
+    where T: KeyInit + AeadCore + AeadInPlace
+{
+    fn into(self) -> Vec<u8> {
+        let mut raw = Vec::with_capacity(size_of::<u8>() + self.len());
+        raw.push(self.nonce.len() as u8);
+
+        for i in self.nonce {
+            raw.push(i)
         }
+
+        for i in self.bytes {
+            raw.push(i);
+        }
+
+        raw
     }
-}*/
+}
+
+impl <T>TryFrom<Vec<u8>> for Encrypted<T>
+    where T: KeyInit + AeadCore + AeadInPlace
+{
+    type Error = EncryptionError;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        if value.len() < size_of::<u8>() {
+            return Err(EncryptionError::InvalidLength(InvalidLength));
+        }
+
+        let nonce_len = value[0];
+        if value.len() < size_of::<u8>() + (nonce_len as usize) {
+            return Err(EncryptionError::InvalidLength(InvalidLength));
+        }
+
+        let n: Vec<u8> = value.iter()
+            .skip(size_of::<u8>())
+            .take(nonce_len as usize)
+            .map(|x|*x)
+            .collect();
+        let nonce = Nonce::<T>::clone_from_slice(n.as_slice());
+
+        let bytes: Vec<u8> = value.iter()
+            .skip(size_of::<u8>() + nonce.len())
+            .map(|x|*x)
+            .collect();
+        Ok(Encrypted::new(bytes, nonce))
+    }
+}
 
 pub fn encrypt<T>(data: &[u8], secret: &Secret) -> Result<Encrypted<T>,EncryptionError>
     where T: KeyInit + AeadCore + AeadInPlace
@@ -67,17 +125,13 @@ pub fn encrypt<T>(data: &[u8], secret: &Secret) -> Result<Encrypted<T>,Encryptio
     let enc = cipher.encrypt(&nonce, data)
         .map_err(|e|EncryptionError::EncryptionFailed)?;
 
-    println!("Nonce: {:?}", &nonce);
-    println!("Data: {:?}", enc);
-
     Ok(Encrypted::new(enc, nonce))
-    //Ok(Encrypted::from(enc))
 }
 
 #[cfg(test)]
 mod test {
     use aes_gcm::Aes256Gcm;
-    use crate::crypto::encrypted::encrypt;
+    use crate::crypto::encrypted::{encrypt, Encrypted};
     use crate::crypto::secret::Secret;
 
     #[test]
@@ -96,5 +150,23 @@ mod test {
         let dec = dec.unwrap();
 
         assert_eq!(message.len(), dec.len());
+    }
+
+    #[test]
+    fn try_from_returns_ok() {
+        let s = Secret::default();
+        let message = b"Encrypted message for a database";
+        let enc_a = encrypt::<Aes256Gcm>(message, &s);
+        assert!(enc_a.is_ok());
+
+        let enc_a = enc_a.unwrap();
+        let raw: Vec<u8> = enc_a.clone().into();
+        assert!(raw.len() > 0);
+
+        let enc_b = Encrypted::<Aes256Gcm>::try_from(raw);
+        assert!(enc_b.is_ok());
+
+        let enc_b = enc_b.unwrap();
+        assert_eq!(enc_a, enc_b);
     }
 }

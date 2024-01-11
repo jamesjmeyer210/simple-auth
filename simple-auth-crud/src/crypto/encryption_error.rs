@@ -3,7 +3,8 @@ use aes_gcm::aes::cipher::InvalidLength;
 #[derive(Debug)]
 pub enum EncryptionError {
     InvalidLength(InvalidLength),
-    EncryptionFailed
+    EncryptionFailed,
+    DecodingFailed
 }
 
 #[derive(Debug)]
