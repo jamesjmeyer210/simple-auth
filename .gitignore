@@ -9,3 +9,6 @@
 
 # logging
 log
+
+# crypto
+enc_key
