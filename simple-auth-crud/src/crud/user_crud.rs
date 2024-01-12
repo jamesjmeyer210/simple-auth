@@ -1,8 +1,12 @@
+use std::hash::Hash;
 use std::sync::Arc;
+use aes_gcm::Aes256Gcm;
+use simple_auth_model::abs::AsBytes;
 use simple_auth_model::User;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
-use crate::crypto::SecretStore;
+use crate::crypto::abs::AsHash;
+use crate::crypto::{SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
 
@@ -53,7 +57,14 @@ impl <'r>UserCrud<'r> {
             return Ok(user);
         }
 
-
+        let contacts = user.contact_info.iter().map(|x|{
+            let mut entity = ContactInfoEntity::new(x, &user.id);
+            entity.hash = Sha256Hash::from(x.value.as_bytes()).into();
+            entity.enc = secret_store.encrypt::<Aes256Gcm>(x.value.as_bytes()).unwrap().into();
+            entity
+        }).collect();
+        let c = self._contacts.add_contacts(&contacts).await?;
+        log::debug!("Added {} contacts to user {}", c, &entity.name);
 
         Ok(user)
     }

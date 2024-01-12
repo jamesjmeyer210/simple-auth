@@ -16,6 +16,12 @@ impl From<&[u8]> for Sha256Hash {
     }
 }
 
+impl Into<Vec<u8>> for Sha256Hash {
+    fn into(self) -> Vec<u8> {
+        self._hash
+    }
+}
+
 impl AsBytes for Sha256Hash {
     fn as_bytes(&self) -> &[u8] {
         self._hash.as_slice()

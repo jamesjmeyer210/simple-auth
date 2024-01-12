@@ -1,13 +1,11 @@
 use std::fs;
 use std::sync::Arc;
-use aes_gcm::{
-    aead::{KeyInit},
-    Aes256Gcm
-};
+use aes_gcm::{aead::{KeyInit}, AeadCore, AeadInPlace, Aes256Gcm};
 use aes_gcm::aead::Aead;
 use simple_auth_model::abs::AsBytes;
 use crate::abs::table::Table;
 use crate::crypto::encrypted::{encrypt, Encrypted};
+use crate::crypto::EncryptionError;
 use crate::crypto::secret::Secret;
 use crate::DbContext;
 use crate::entity::SecretEntity;
@@ -49,6 +47,11 @@ impl SecretStore {
 
     fn set_sig_key(&mut self, secret: Secret) -> () {
         self._inner._sig_key = secret;
+    }
+    pub fn encrypt<T>(&self, data: &[u8]) -> Result<Encrypted<T>,EncryptionError>
+        where T: KeyInit + AeadCore + AeadInPlace
+    {
+        encrypt(data, self.enc_key())
     }
 }
 
