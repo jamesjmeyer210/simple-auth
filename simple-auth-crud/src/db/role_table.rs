@@ -1,7 +1,7 @@
 use crate::abs::table::Table;
-use crate::entity::RoleEntity;
+use crate::entity::{Count, RoleEntity};
 
-impl<'r> Table<'r, RoleEntity, String> {
+impl<'r> Table<'r, RoleEntity> {
     pub async fn add(&self, model: &RoleEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"
@@ -15,6 +15,17 @@ impl<'r> Table<'r, RoleEntity, String> {
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
+    }
+
+    pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
+        sqlx::query_as(r#"
+            SELECT COUNT(*) FROM `roles` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#)
+            .bind(name)
+            .fetch_one(&*self.pool)
+            .await
+            .map(|x: Count|x.into())
     }
 
     pub async fn all(&self) -> Result<Vec<RoleEntity>, sqlx::Error> {

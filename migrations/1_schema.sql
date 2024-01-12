@@ -57,15 +57,6 @@ create table if not exists `roles_to_realms` (
             on delete cascade
 );
 
-drop table if exists `users`;
-create table if not exists `users` (
-    `id` text primary key not null unique,
-    `name` text not null unique,
-    `password` blob not null,
-    `created_on` text not null,
-    `deleted_on` text
-);
-
 drop table if exists `role_events`;
 create table if not exists `role_events` (
     `id` integer primary key autoincrement not null,
@@ -81,18 +72,13 @@ create table if not exists `role_events` (
             on delete cascade
 );
 
-drop table if exists `users_to_roles`;
-create table if not exists `users_to_roles` (
-    `user_id` text not null,
-    `role_id` text not null,
-    constraint fk_user_id
-        foreign key (`user_id`)
-            references users(`id`)
-            on delete cascade,
-    constraint fk_role_id
-        foreign key (`role_id`)
-            references roles(`name`)
-            on delete cascade
+drop table if exists `users`;
+create table if not exists `users` (
+    `id` text primary key not null unique,
+    `name` text not null unique,
+    `password` blob not null,
+    `created_on` text not null,
+    `deleted_on` text
 );
 
 drop table if exists `users_to_realms`;
@@ -109,6 +95,20 @@ create table if not exists `users_to_realms` (
              on delete cascade
 );
 
+drop table if exists `users_to_roles`;
+create table if not exists `users_to_roles` (
+    `user_id` text not null,
+    `role_id` text not null,
+    constraint fk_user_id
+        foreign key (`user_id`)
+            references users(`id`)
+            on delete cascade,
+    constraint fk_role_id
+        foreign key (`role_id`)
+            references roles(`name`)
+            on delete cascade
+);
+
 drop table if exists `users_contact_info`;
 create table if not exists `users_contact_info` (
     `hash` blob primary key not null unique,
@@ -121,4 +121,11 @@ create table if not exists `users_contact_info` (
     foreign key (`user_id`)
         references users(`id`)
         on delete cascade
+);
+
+drop table if exists `secrets`;
+create table if not exists `secrets` (
+    `key` text primary key not null,
+    `value_enc` blob not null,
+    `expires_on` text
 );

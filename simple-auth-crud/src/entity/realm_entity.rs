@@ -1,13 +1,24 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
-use crate::abs::Entity;
+use simple_auth_model::Realm;
 
 #[derive(Debug)]
 pub(crate) struct RealmEntity {
     pub name: String,
     pub created_on: DateTime<Utc>,
     pub deleted_on: Option<DateTime<Utc>>
+}
+
+impl From<RealmEntity> for Realm {
+    fn from(value: RealmEntity) -> Self {
+        Self {
+            name: value.name,
+            created_on: value.created_on,
+            roles: Vec::with_capacity(0),
+            users: Vec::with_capacity(0),
+        }
+    }
 }
 
 impl From<&str> for RealmEntity {
@@ -27,19 +38,5 @@ impl <'r>FromRow<'r, SqliteRow> for RealmEntity {
             created_on: row.try_get(1)?,
             deleted_on: row.try_get(2)?
         })
-    }
-}
-
-impl <'r>Entity<'r, String> for RealmEntity {
-    fn primary_key(&self) -> &String {
-        &self.name
-    }
-
-    fn created_on(&self) -> &DateTime<Utc> {
-        &self.created_on
-    }
-
-    fn is_deleted(&self) -> bool {
-        self.deleted_on.is_some()
     }
 }

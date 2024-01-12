@@ -6,3 +6,9 @@
 
 # sqlite
 *.sqlite
+
+# logging
+log
+
+# crypto
+enc_key

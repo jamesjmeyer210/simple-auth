@@ -1,13 +1,13 @@
 use simple_auth_model::Password;
+use simple_auth_model::abs::AsBytes;
 use argon2::{
     password_hash::{
         rand_core::{OsRng, RngCore}
     },
     Argon2
 };
-use sqlx::{Database, Decode, Encode, Type, Value, ValueRef};
-use sqlx::database::{HasArguments, HasValueRef};
-use sqlx::encode::IsNull;
+use sqlx::{Database, Decode, Type};
+use sqlx::database::{HasValueRef};
 use sqlx::error::BoxDynError;
 
 pub(crate) struct PasswordHash {
@@ -21,10 +21,10 @@ impl PasswordHash {
     }
 }
 
-impl TryFrom<Password> for PasswordHash {
+impl TryFrom<&Password> for PasswordHash {
     type Error = argon2::Error;
 
-    fn try_from(value: Password) -> Result<Self, Self::Error> {
+    fn try_from(value: &Password) -> Result<Self, Self::Error> {
         let argon2 = Argon2::default();
         let mut salt = [0u8; 16];
         OsRng.fill_bytes(&mut salt);
@@ -69,7 +69,7 @@ mod test {
         assert!(p.is_ok());
 
         let p = p.unwrap();
-        let h = PasswordHash::try_from(p);
+        let h = PasswordHash::try_from(&p);
         assert!(h.is_ok())
     }
 }

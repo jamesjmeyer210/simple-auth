@@ -1,8 +1,8 @@
 use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
+use simple_auth_model::ContactInfo;
 use simple_auth_model::uuid::Uuid;
-use crate::abs::Entity;
 
 pub(crate) struct ContactInfoEntity {
     pub user_id: Uuid,
@@ -28,16 +28,17 @@ impl<'r> FromRow<'r, SqliteRow> for ContactInfoEntity {
     }
 }
 
-impl <'r>Entity<'r, Vec<u8>> for ContactInfoEntity {
-    fn primary_key(&self) -> &Vec<u8> {
-        &self.hash
-    }
-
-    fn created_on(&self) -> &DateTime<Utc> {
-        &self.created_on
-    }
-
-    fn is_deleted(&self) -> bool {
-        self.deleted_on.is_some()
+impl ContactInfoEntity {
+    pub fn new(contact: &ContactInfo, user_id: &Uuid) -> Self
+    {
+        Self {
+            user_id: user_id.clone(),
+            label: contact.label.clone(),
+            enc: vec![],
+            hash: vec![],
+            verified: false,
+            created_on: Utc::now(),
+            deleted_on: None,
+        }
     }
 }

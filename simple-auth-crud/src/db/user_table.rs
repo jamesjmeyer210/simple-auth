@@ -1,8 +1,7 @@
-use sqlx::types::Uuid;
 use crate::abs::table::Table;
-use crate::entity::UserEntity;
+use crate::entity::{Count, UserEntity};
 
-impl<'r> Table<'r, UserEntity, Uuid> {
+impl<'r> Table<'r, UserEntity> {
     pub async fn add(&self, model: &UserEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"
@@ -16,6 +15,17 @@ impl<'r> Table<'r, UserEntity, Uuid> {
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
+    }
+
+    pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
+        sqlx::query_as(r#"
+            SELECT COUNT(*) FROM `users` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#)
+            .bind(name)
+            .fetch_one(&*self.pool)
+            .await
+            .map(|x: Count|x.into())
     }
 
     pub async fn all(&self) -> Result<Vec<UserEntity>, sqlx::Error> {
@@ -42,6 +52,11 @@ mod test {
 
         let x = db.users.add(&user).await;
         assert!(x.is_ok());
+
+        let count = db.users.count_by_name(&user.name).await;
+        assert!(count.is_ok());
+        let count = count.unwrap();
+        assert_eq!(1, count);
 
         let entities = db.users.all().await;
         assert!(x.is_ok());

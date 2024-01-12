@@ -1,6 +1,7 @@
 use lazy_regex::regex_is_match;
-use crate::abs::IsValid;
+use crate::abs::{AsBytes, IsValid};
 
+#[derive(Debug)]
 pub struct Email {
     _inner: String,
 }
@@ -21,6 +22,12 @@ impl TryFrom<&str> for Email {
 impl IsValid<&str> for Email {
     fn is_valid(value: &str) -> bool {
         regex_is_match!(r"^([a-zA-Z0-9!#$%&'*+\-/=?^_`{|}~]{1,256}@)([a-z0-9]{1,256})([.][a-z0-9]{1,64}){1,8}$", value)
+    }
+}
+
+impl AsBytes for Email {
+    fn as_bytes(&self) -> &[u8] {
+        self._inner.as_bytes()
     }
 }
 

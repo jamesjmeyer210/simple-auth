@@ -1,7 +1,7 @@
 use crate::abs::table::Table;
 use crate::entity::{Count, RealmEntity};
 
-impl<'r> Table<'r, RealmEntity, String> {
+impl<'r> Table<'r, RealmEntity> {
     pub async fn add(&self, model: &RealmEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"
@@ -18,6 +18,17 @@ impl<'r> Table<'r, RealmEntity, String> {
 
     pub async fn count(&self) -> Result<u32, sqlx::Error> {
         sqlx::query_as("SELECT COUNT(*) FROM `realms` as `a` WHERE `a`.`deleted_on` IS NULL",)
+            .fetch_one(&*self.pool)
+            .await
+            .map(|x: Count|x.into())
+    }
+
+    pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
+        sqlx::query_as(r#"
+            SELECT COUNT(*) FROM `realms` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#)
+            .bind(name)
             .fetch_one(&*self.pool)
             .await
             .map(|x: Count|x.into())
