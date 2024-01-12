@@ -1,6 +1,6 @@
 use sha2::{Digest, Sha256};
 use simple_auth_model::abs::AsBytes;
-use crate::crypto::Hash;
+use crate::crypto::abs::Hash;
 
 pub(crate) struct Sha256Hash {
     _hash: Vec<u8>

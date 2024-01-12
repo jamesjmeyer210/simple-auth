@@ -2,6 +2,7 @@ use std::sync::Arc;
 use simple_auth_model::User;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
+use crate::crypto::SecretStore;
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
 
@@ -30,7 +31,7 @@ impl <'r>UserCrud<'r> {
             .map(|x|x == 1)
     }
 
-    pub async fn add<'u>(&self, user: &'u User) -> Result<&'u User,sqlx::Error> {
+    pub async fn add<'u>(&self, user: &'u User, secret_store: &SecretStore) -> Result<&'u User,sqlx::Error> {
         let realms: Vec<&String> = user.realms.iter().map(|x|&x.name).collect();
         let roles: Vec<&String> = user.roles.iter().map(|x|&x.name).collect();
         let entity = UserEntity::from(user);
@@ -47,6 +48,12 @@ impl <'r>UserCrud<'r> {
             let c = self._roles.add_roles_to_user(&entity.id, &roles).await?;
             log::debug!("Added {} roles to user {}", c, &entity.name);
         }
+
+        if user.contact_info.len() == 0 {
+            return Ok(user);
+        }
+
+
 
         Ok(user)
     }

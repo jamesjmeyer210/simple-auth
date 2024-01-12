@@ -1,10 +1,10 @@
 use std::ops::{BitXor, Deref};
 use aes_gcm::aead::OsRng;
 use aes_gcm::{Aes256Gcm, KeyInit};
-use sha2::{Sha256, Digest};
+use sha2::{Digest};
 use sha2::digest::{DynDigest, FixedOutput};
 use simple_auth_model::abs::AsBytes;
-use crate::crypto::AsHash;
+use crate::crypto::abs::AsHash;
 use crate::crypto::sha_256_hash::Sha256Hash;
 
 pub struct Secret {
@@ -45,7 +45,7 @@ impl AsBytes for Secret {
 #[cfg(test)]
 mod test {
     use simple_auth_model::abs::AsBytes;
-    use crate::crypto::{AsHash, Hash};
+    use crate::crypto::abs::{AsHash, Hash};
     use super::Secret;
 
     #[test]

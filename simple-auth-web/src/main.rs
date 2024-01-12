@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
 use simple_auth_web::di::{ServiceCollection, ServiceProvider};
@@ -35,7 +36,7 @@ async fn main() {
 
     let mut services = ServiceCollection::new();
     services.add(db);
-    services.add(secret_store);
+    services.add(Arc::new(secret_store));
 
     let provider = services.build_provider();
 
