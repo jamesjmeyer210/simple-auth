@@ -9,7 +9,6 @@ impl ServiceCollection {
     pub fn new() -> Self {
         Self {
             _data: HashMap::default(),
-            //_factories: HashMap::default(),
         }
     }
 
@@ -28,11 +27,9 @@ pub struct ServiceProvider {
 
 impl From<ServiceCollection> for ServiceProvider {
     fn from(value: ServiceCollection) -> Self {
-        let mut sp = Self {
+        Self {
             _data: value._data,
-        };
-
-        sp
+        }
     }
 }
 

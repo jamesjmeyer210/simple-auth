@@ -1,9 +1,8 @@
 use std::fmt::{Debug, Formatter};
-use std::io::Read;
 use std::mem::size_of;
-use aes_gcm::{AeadCore, AeadInPlace, KeyInit, KeySizeUser, TagSize};
+use aes_gcm::{AeadCore, AeadInPlace, KeyInit};
 use aes_gcm::aead::{Aead, OsRng, Nonce};
-use aes_gcm::aes::cipher::{ArrayLength, InvalidLength};
+use aes_gcm::aes::cipher::{InvalidLength};
 use simple_auth_model::abs::AsBytes;
 use crate::crypto::encryption_error::DecryptionError;
 use crate::crypto::EncryptionError;

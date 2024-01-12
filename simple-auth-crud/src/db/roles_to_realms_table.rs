@@ -18,7 +18,7 @@ impl <'r>JoinTable<'r, RoleEntity, RealmEntity> {
                .push_bind(relation.1);
         });
 
-        let mut query = query_builder.build();
+        let query = query_builder.build();
         query.execute(&*self.pool).await.map(|x|x.rows_affected())
     }
 

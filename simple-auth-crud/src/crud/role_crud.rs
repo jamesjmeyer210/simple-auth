@@ -1,6 +1,5 @@
 use std::sync::Arc;
 use simple_auth_model::Role;
-use simple_auth_model::log4rs;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::db::DbContext;

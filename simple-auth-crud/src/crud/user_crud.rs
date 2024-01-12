@@ -1,11 +1,9 @@
-use std::hash::Hash;
 use std::sync::Arc;
 use aes_gcm::Aes256Gcm;
 use simple_auth_model::abs::AsBytes;
 use simple_auth_model::User;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
-use crate::crypto::abs::AsHash;
 use crate::crypto::{SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};

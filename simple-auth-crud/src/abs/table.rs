@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 use std::sync::Arc;
-use sqlx::{FromRow, Sqlite, SqlitePool, Type};
+use sqlx::{FromRow, SqlitePool};
 use sqlx::sqlite::SqliteRow;
 
 pub struct Table<'r, T>

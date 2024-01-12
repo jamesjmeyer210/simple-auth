@@ -1,7 +1,6 @@
 use std::fs;
 use std::sync::Arc;
 use aes_gcm::{aead::{KeyInit}, AeadCore, AeadInPlace, Aes256Gcm};
-use aes_gcm::aead::Aead;
 use simple_auth_model::abs::AsBytes;
 use crate::abs::table::Table;
 use crate::crypto::encrypted::{encrypt, Encrypted};

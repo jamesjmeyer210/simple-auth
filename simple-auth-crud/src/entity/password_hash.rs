@@ -6,8 +6,8 @@ use argon2::{
     },
     Argon2
 };
-use sqlx::{Database, Decode, Encode, Type, Value, ValueRef};
-use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::{Database, Decode, Type};
+use sqlx::database::{HasValueRef};
 use sqlx::error::BoxDynError;
 
 pub(crate) struct PasswordHash {
