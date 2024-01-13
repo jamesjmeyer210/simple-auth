@@ -1,5 +1,6 @@
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
+use std::sync::Arc;
 
 pub struct ServiceCollection {
     _data: HashMap<TypeId, Box<dyn Any>>,
@@ -22,13 +23,13 @@ impl ServiceCollection {
 }
 
 pub struct ServiceProvider {
-    _data: HashMap<TypeId, Box<dyn Any>>,
+    _data: Arc<HashMap<TypeId, Box<dyn Any>>>,
 }
 
 impl From<ServiceCollection> for ServiceProvider {
     fn from(value: ServiceCollection) -> Self {
         Self {
-            _data: value._data,
+            _data: Arc::new(value._data),
         }
     }
 }
@@ -56,7 +57,7 @@ impl ServiceProvider {
 mod test {
     use simple_auth_crud::crud::RealmCrud;
     use simple_auth_crud::DbContext;
-    use crate::di::ServiceCollection;
+    use super::ServiceCollection;
     use crate::service::RealmService;
 
     #[actix_rt::test]

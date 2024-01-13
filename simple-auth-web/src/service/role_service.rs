@@ -1,22 +1,22 @@
 use simple_auth_crud::crud::RoleCrud;
 use simple_auth_crud::DbContext;
 use simple_auth_model::{Realm, Role};
-use crate::di::ServiceProvider;
+use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 
-pub struct RoleService {
-    _crud: RoleCrud<'static>
+pub struct RoleService<'r> {
+    _crud: RoleCrud<'r>
 }
 
-impl From<&ServiceProvider> for RoleService {
-    fn from(value: &ServiceProvider) -> Self {
+impl <'r>From<&ServiceFactory<'_>> for RoleService<'r> {
+    fn from(value: &ServiceFactory) -> Self {
         Self {
-            _crud: value.get::<DbContext>().unwrap().into()
+            _crud: value.get_singleton::<DbContext>().map(|x|x.as_ref()).unwrap().into()
         }
     }
 }
 
-impl RoleService {
+impl <'r>RoleService<'r> {
     pub async fn add_default(&self, realm: Realm) -> Result<Role,ServiceError> {
         let role = Role::default().with_realm(realm);
 

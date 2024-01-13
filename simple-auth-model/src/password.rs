@@ -1,3 +1,4 @@
+use serde::{Serialize, Serializer};
 use crate::abs::AsBytes;
 
 // TODO: implement custom Debug that protects the password
@@ -18,6 +19,12 @@ impl TryFrom<&str> for Password {
                 _inner: value.to_string()
             })
         }
+    }
+}
+
+impl Serialize for Password {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
+        serializer.serialize_str("************")
     }
 }
 

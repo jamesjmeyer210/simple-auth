@@ -3,24 +3,24 @@ use simple_auth_crud::crud::UserCrud;
 use simple_auth_crud::crypto::SecretStore;
 use simple_auth_crud::DbContext;
 use simple_auth_model::{ContactInfo, Realm, Role, User};
-use crate::di::ServiceProvider;
+use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 
-pub struct UserService {
-    _crud: UserCrud<'static>,
+pub struct UserService<'r> {
+    _crud: UserCrud<'r>,
     _secret_store: Arc<SecretStore>,
 }
 
-impl From<&ServiceProvider> for UserService {
-    fn from(value: &ServiceProvider) -> Self {
+impl <'r>From<&ServiceFactory<'_>> for UserService<'r> {
+    fn from(value: &ServiceFactory) -> Self {
         Self {
-            _crud: value.get::<DbContext>().unwrap().into(),
-            _secret_store: value.get::<Arc<SecretStore>>().unwrap().clone(),
+            _crud: value.get_singleton::<DbContext>().map(|x|x.as_ref()).unwrap().into(),
+            _secret_store: value.get_singleton::<SecretStore>().unwrap(),
         }
     }
 }
 
-impl UserService {
+impl <'r>UserService<'r> {
     pub async fn add_default(&self, realm: Realm, role: Role) -> Result<User,ServiceError> {
         let user = User::default()
             .with_realm(realm)

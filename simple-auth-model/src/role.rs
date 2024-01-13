@@ -1,7 +1,8 @@
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 use crate::realm::Realm;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Role {
     pub name: String,
     pub max: Option<u32>,
