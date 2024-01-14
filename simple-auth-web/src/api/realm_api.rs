@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse, Responder, web};
+use actix_web::{get, HttpResponse, post, Responder, web};
 use actix_web::web::ServiceConfig;
 use crate::api::RegisterApi;
 use crate::di::{ServiceFactory, TransientFactory};
@@ -10,6 +10,7 @@ impl RegisterApi for RealmApi {
     fn register(cfg: &mut ServiceConfig) {
         cfg.service(get_all);
         cfg.service(get_by_id);
+        cfg.service(add);
     }
 }
 
@@ -33,6 +34,18 @@ async fn get_by_id(id: web::Path<String>, service_provider: web::Data<ServiceFac
         Err(e) => {
             log::error!("{:?}", e);
             HttpResponse::NotFound().finish()
+        }
+    }
+}
+
+#[post("/realm")]
+async fn add(realm: web::Json<String>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
+    let service: RealmService = factory.get_transient();
+    match service.add(realm.as_str()).await {
+        Ok(realm) => HttpResponse::Ok().json(realm),
+        Err(e) => {
+            log::error!("{:?}", e);
+            HttpResponse::InternalServerError().finish()
         }
     }
 }

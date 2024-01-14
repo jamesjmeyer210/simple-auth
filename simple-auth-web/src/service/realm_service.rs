@@ -40,6 +40,13 @@ impl <'r>RealmService<'r> {
         Ok(realm)
     }
 
+    pub async fn add(&self, realm: &str) -> Result<Realm,ServiceError> {
+        let crud = self.db_context.get_crud::<RealmCrud>();
+        crud.add(realm)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
+
     pub async fn get_all(&self) -> Result<Vec<Realm>,ServiceError> {
         let crud = self.db_context.get_crud::<RealmCrud>();
 
