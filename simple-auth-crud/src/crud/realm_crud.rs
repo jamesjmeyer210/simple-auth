@@ -31,8 +31,10 @@ impl <'r>RealmCrud<'r> {
             .collect()
     }
 
-    async fn get_by_id(&self) -> Result<Realm, sqlx::Error> {
-        todo!()
+    pub async fn get_by_id(&self, id: &str) -> Result<Realm, sqlx::Error> {
+        self._realms.get_by_id(id)
+            .await
+            .map(|x|x.into())
     }
 
     pub async fn contains(&self, realm: &str) -> Result<bool,sqlx::Error> {

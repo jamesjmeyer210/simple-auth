@@ -49,7 +49,10 @@ impl <'r>RealmService<'r> {
     }
 
     pub async fn get_by_id(&self, id: &str) -> Result<Realm,ServiceError> {
-        todo!()
+        let crud = self.db_context.get_crud::<RealmCrud>();
+        crud.get_by_id(id)
+            .await
+            .map_err(|e|ServiceError::from(e))
     }
 }
 
@@ -57,7 +60,7 @@ impl <'r>RealmService<'r> {
 mod test {
     use simple_auth_crud::crud::RealmCrud;
     use simple_auth_crud::DbContext;
-    use crate::di::{ServiceFactory, SingletonFactory, TransientFactory};
+    use crate::di::{ServiceFactory, TransientFactory};
     use crate::service::RealmService;
 
     #[actix_rt::test]
@@ -67,6 +70,6 @@ mod test {
         let factory = ServiceFactory::new()
             .add_singleton(db);
 
-        let service = factory.get_transient::<RealmService>();
+        let service: RealmService = factory.get_transient();
     }
 }
