@@ -8,7 +8,7 @@ pub trait DataFactory<T> {
 }
 
 trait SingletonFactory<T> {
-    fn add_singleton(&mut self, singleton: T) -> &Self;
+    fn add_singleton(self, singleton: T) -> Self;
     fn get_singleton(&self) -> Option<Arc<T>>;
 }
 
@@ -31,7 +31,7 @@ impl ServiceFactory<'_> {
         }
     }
 
-    pub fn add_singleton<T>(&mut self, singleton: T) -> &Self
+    pub fn add_singleton<T>(mut self, singleton: T) -> Self
         where Self: SingletonFactory<T>
     {
         <Self as SingletonFactory<T>>::add_singleton(self, singleton)
@@ -44,12 +44,12 @@ impl ServiceFactory<'_> {
     }
 }
 
-impl <T>TransientFactory<T> for ServiceFactory<'_> where T: for<'a> From<&'a Self> {
+impl <T>TransientFactory<T> for ServiceFactory<'_> where T: for<'t> From<&'t Self> {
 
 }
 
 impl <'r>SingletonFactory<DbContext<'r>> for ServiceFactory<'r> {
-    fn add_singleton(&mut self, singleton: DbContext<'r>) -> &Self {
+    fn add_singleton(mut self, singleton: DbContext<'r>) -> Self {
         self.db_context = Some(Arc::new(singleton));
         self
     }
@@ -60,7 +60,7 @@ impl <'r>SingletonFactory<DbContext<'r>> for ServiceFactory<'r> {
 }
 
 impl SingletonFactory<SecretStore> for ServiceFactory<'_> {
-    fn add_singleton(&mut self, singleton: SecretStore) -> &Self {
+    fn add_singleton(mut self, singleton: SecretStore) -> Self {
         self.secret_store = Some(Arc::new(singleton));
         self
     }

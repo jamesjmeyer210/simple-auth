@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use simple_auth_crud::crud::RealmCrud;
 use simple_auth_crud::DbContext;
 use simple_auth_model::Realm;
@@ -5,13 +6,13 @@ use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 
 pub struct RealmService<'r> {
-    _crud: RealmCrud<'r>
+    db_context: Arc<DbContext<'r>>,
 }
 
-impl <'r>From<&ServiceFactory<'_>> for RealmService<'r> {
-    fn from(value: &ServiceFactory) -> Self {
+impl <'r>From<&ServiceFactory<'r>> for RealmService<'r> {
+    fn from(value: &ServiceFactory<'r>) -> Self {
         Self {
-            _crud: value.get_singleton::<DbContext>().map(|x|x.as_ref()).unwrap().into()
+            db_context: value.get_singleton::<DbContext>().unwrap()
         }
     }
 }
@@ -20,7 +21,9 @@ impl <'r>RealmService<'r> {
     pub async fn add_default(&self) -> Result<Realm,ServiceError> {
         let realm = Realm::default();
 
-        let exists = self._crud.contains(&realm.name)
+        let crud = self.db_context.get_crud::<RealmCrud>();
+
+        let exists = crud.contains(&realm.name)
             .await
             .map_err(|e|ServiceError::from(e))?;
 
@@ -29,7 +32,7 @@ impl <'r>RealmService<'r> {
             return Ok(realm);
         }
 
-        let realm = self._crud.add(&realm.name)
+        let realm = crud.add(&realm.name)
             .await
             .map_err(|e|ServiceError::from(e))?;
 
@@ -38,7 +41,9 @@ impl <'r>RealmService<'r> {
     }
 
     pub async fn get_all(&self) -> Result<Vec<Realm>,ServiceError> {
-        self._crud.get_all()
+        let crud = self.db_context.get_crud::<RealmCrud>();
+
+        crud.get_all()
             .await
             .map_err(|e|ServiceError::from(e))
     }

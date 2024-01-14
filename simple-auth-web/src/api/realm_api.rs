@@ -4,11 +4,6 @@ use crate::api::RegisterApi;
 use crate::di::{ServiceFactory, TransientFactory};
 use crate::service::RealmService;
 
-/*pub fn register(cfg: &mut web::ServiceConfig) {
-//    cfg.service(get_by_id);
-    cfg.service(get_all);
-}*/
-
 pub struct RealmApi;
 
 impl RegisterApi for RealmApi {

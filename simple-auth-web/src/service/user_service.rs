@@ -7,15 +7,15 @@ use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 
 pub struct UserService<'r> {
-    _crud: UserCrud<'r>,
-    _secret_store: Arc<SecretStore>,
+    db_context: Arc<DbContext<'r>>,
+    secret_store: Arc<SecretStore>,
 }
 
-impl <'r>From<&ServiceFactory<'_>> for UserService<'r> {
-    fn from(value: &ServiceFactory) -> Self {
+impl <'r>From<&ServiceFactory<'r>> for UserService<'r> {
+    fn from(value: &ServiceFactory<'r>) -> Self {
         Self {
-            _crud: value.get_singleton::<DbContext>().map(|x|x.as_ref()).unwrap().into(),
-            _secret_store: value.get_singleton::<SecretStore>().unwrap(),
+            db_context: value.get_singleton::<DbContext>().unwrap(),
+            secret_store: value.get_singleton::<SecretStore>().unwrap(),
         }
     }
 }
@@ -27,12 +27,13 @@ impl <'r>UserService<'r> {
             .with_role(role)
             .with_contact_info(ContactInfo::default());
 
-        if self._crud.contains_by_name(&user.name).await? {
+        let crud = self.db_context.get_crud::<UserCrud>();
+        if crud.contains_by_name(&user.name).await? {
             log::debug!("Default user {} exists", &user.name);
             return Ok(user);
         }
 
-        self._crud.add(&user, self._secret_store.as_ref()).await?;
+        crud.add(&user, self.secret_store.as_ref()).await?;
         Ok(user)
     }
 }

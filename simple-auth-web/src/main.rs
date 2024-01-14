@@ -1,13 +1,12 @@
-use std::sync::Arc;
 use actix_web::{App, HttpServer, web};
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
 use simple_auth_web::api::{RealmApi, RegisterApi};
-use simple_auth_web::di::{ServiceFactory, SingletonFactory, TransientFactory};
+use simple_auth_web::di::{ServiceFactory, TransientFactory};
 use simple_auth_web::error::ServiceError;
 use simple_auth_web::service::{RealmService, RoleService, UserService};
 
-async fn init_defaults(provider: &ServiceFactory) -> Result<(),ServiceError> {
+async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError> {
     let realm_service: RealmService = provider.get_transient();
 
     let realm = realm_service.add_default().await?;
@@ -36,15 +35,12 @@ async fn main() -> std::io::Result<()> {
     let secret_store = secret_store.unwrap();
     log::info!("Loaded secrets");
 
-    let factory = ServiceFactory::new();
-    let f = factory
+    let factory = ServiceFactory::new()
         .add_singleton(db)
         .add_singleton(secret_store);
 
-
-    let op = init_defaults(f)clear.await;
+    let op = init_defaults(&factory).await;
     if op.is_err() {
-        //log::error!("{:?}", op.unwrap_err());
         return Err(std::io::Error::other(op.unwrap_err()));
     }
 
