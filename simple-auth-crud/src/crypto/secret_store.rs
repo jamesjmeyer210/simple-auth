@@ -1,3 +1,5 @@
+use std::any::TypeId;
+use std::fmt::{Debug, Formatter};
 use std::fs;
 use std::sync::Arc;
 use aes_gcm::{aead::{KeyInit}, AeadCore, AeadInPlace, Aes256Gcm};
@@ -32,6 +34,12 @@ impl Default for SecretStore {
         Self {
             _inner: Box::new(SecretStoreInner::default())
         }
+    }
+}
+
+impl Debug for SecretStore {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", TypeId::of::<Self>())
     }
 }
 

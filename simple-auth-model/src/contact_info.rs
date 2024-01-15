@@ -1,7 +1,8 @@
+use serde::Serialize;
 use crate::abs::AsBytes;
 use crate::Email;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct ContactInfo {
     pub verified: bool,
     pub label: String,
@@ -18,7 +19,7 @@ impl Default for ContactInfo {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum ContactValue {
     Email(Email),
     Other(String)

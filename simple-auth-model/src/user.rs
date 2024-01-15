@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 use uuid::Uuid;
 use crate::contact_info::ContactInfo;
 use crate::email::Email;
@@ -7,7 +8,7 @@ use crate::password::Password;
 use crate::realm::Realm;
 use crate::role::Role;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct User {
     pub id: Uuid,
     pub name: String,

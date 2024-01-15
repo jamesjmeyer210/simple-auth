@@ -1,27 +1,28 @@
-use std::sync::Arc;
+use actix_web::{App, HttpServer, web};
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
-use simple_auth_web::di::{ServiceCollection, ServiceProvider};
+use simple_auth_web::api::{RealmApi, RegisterApi};
+use simple_auth_web::di::{ServiceFactory, TransientFactory};
 use simple_auth_web::error::ServiceError;
 use simple_auth_web::service::{RealmService, RoleService, UserService};
 
-async fn init_defaults(provider: &ServiceProvider) -> Result<(),ServiceError> {
-    let realm_service = provider.get_transient::<RealmService>();
+async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError> {
+    let realm_service: RealmService = provider.get_transient();
 
     let realm = realm_service.add_default().await?;
 
-    let role_service = provider.get_transient::<RoleService>();
+    let role_service: RoleService = provider.get_transient();
     let mut role = role_service.add_default(realm).await?;
     let realm = role.realms.pop().unwrap();
 
-    let user_service = provider.get_transient::<UserService>();
+    let user_service: UserService = provider.get_transient();
 
     let _ = user_service.add_default(realm, role).await?;
     Ok(())
 }
 
-#[actix_rt::main]
-async fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     log4rs::init_file("logcfg.yaml", Default::default()).unwrap();
 
     let db = DbContext::in_memory().await.unwrap();
@@ -29,22 +30,29 @@ async fn main() {
     let secret_store = (&db).get_secret_store().await;
     if secret_store.is_err() {
         log::error!("Failed to load secrets");
-        return;
+        return Err(std::io::Error::other(secret_store.unwrap_err()));
     }
     let secret_store = secret_store.unwrap();
     log::info!("Loaded secrets");
 
-    let mut services = ServiceCollection::new();
-    services.add(db);
-    services.add(Arc::new(secret_store));
+    let factory = ServiceFactory::new()
+        .add_singleton(db)
+        .add_singleton(secret_store);
 
-    let provider = services.build_provider();
-
-    let op = init_defaults(&provider).await;
+    let op = init_defaults(&factory).await;
     if op.is_err() {
-        log::error!("{:?}", op.unwrap_err());
-        return;
+        return Err(std::io::Error::other(op.unwrap_err()));
     }
 
     log::info!("Pre-server start complete!");
+
+    let provider = web::Data::new(factory);
+
+    HttpServer::new(move || {
+       App::new()
+           .app_data(provider.clone())
+           .configure(RealmApi::register)
+    }).bind(("127.0.0.1", 7777))?
+        .run()
+        .await
 }

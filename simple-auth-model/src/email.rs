@@ -1,7 +1,8 @@
 use lazy_regex::regex_is_match;
+use serde::Serialize;
 use crate::abs::{AsBytes, IsValid};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Email {
     _inner: String,
 }

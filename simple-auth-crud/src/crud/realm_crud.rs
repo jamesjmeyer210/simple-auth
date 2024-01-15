@@ -23,12 +23,18 @@ impl <'r>RealmCrud<'r> {
         Ok(entity.into())
     }
 
-    async fn get_all(&self) -> Result<Vec<Realm>, sqlx::Error> {
+    pub async fn get_all(&self) -> Result<Vec<Realm>, sqlx::Error> {
         self._realms.all()
             .await?
             .drain(0..)
             .map(|x|Ok(x.into()))
             .collect()
+    }
+
+    pub async fn get_by_id(&self, id: &str) -> Result<Realm, sqlx::Error> {
+        self._realms.get_by_id(id)
+            .await
+            .map(|x|x.into())
     }
 
     pub async fn contains(&self, realm: &str) -> Result<bool,sqlx::Error> {

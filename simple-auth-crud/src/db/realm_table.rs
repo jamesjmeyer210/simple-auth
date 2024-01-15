@@ -44,6 +44,18 @@ impl<'r> Table<'r, RealmEntity> {
             .fetch_all(&*self.pool)
             .await
     }
+
+    pub async fn get_by_id(&self, id: &str) -> Result<RealmEntity, sqlx::Error> {
+        sqlx::query_as(
+            r#"
+            SELECT `name`, `created_on`, `deleted_on`
+            FROM `realms` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#,)
+            .bind(id)
+            .fetch_one(&*self.pool)
+            .await
+    }
 }
 
 #[cfg(test)]
