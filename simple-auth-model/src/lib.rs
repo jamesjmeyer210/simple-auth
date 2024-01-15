@@ -7,7 +7,6 @@ mod ip_address;
 pub mod abs;
 mod contact_info;
 mod error;
-mod problem_details;
 
 // re-exports
 pub use chrono;
@@ -20,4 +19,3 @@ pub type User = user::User;
 pub type Password = password::Password;
 pub type Email = email::Email;
 pub type ContactInfo = contact_info::ContactInfo;
-pub type ProblemDetails = problem_details::ProblemDetails;

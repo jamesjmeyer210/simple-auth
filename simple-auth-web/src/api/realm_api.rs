@@ -1,7 +1,9 @@
 use actix_web::{get, HttpResponse, post, Responder, web};
+use actix_web::http::StatusCode;
 use actix_web::web::ServiceConfig;
 use crate::api::RegisterApi;
 use crate::di::{ServiceFactory, TransientFactory};
+use crate::dto::ProblemDetails;
 use crate::service::RealmService;
 
 pub struct RealmApi;
@@ -18,11 +20,14 @@ impl RegisterApi for RealmApi {
 async fn get_all(factory: web::Data<ServiceFactory<'_>>) -> impl Responder
 {
     let realm_service: RealmService = factory.get_transient();
-    realm_service.get_all()
-        .await
-        .map(|x|HttpResponse::Ok().json(x))
-        .map_err(|_|HttpResponse::InternalServerError().finish())
-        .unwrap()
+    match realm_service.get_all().await {
+        Ok(realms) => HttpResponse::Ok().json(realms),
+        Err(e) => {
+            log::error!("{:?}", e);
+            let e: ProblemDetails = e.into();
+            HttpResponse::build(e.status_code()).json(e)
+        }
+    }
 }
 
 #[get("/realm/{id}")]
@@ -33,7 +38,8 @@ async fn get_by_id(id: web::Path<String>, service_provider: web::Data<ServiceFac
         Ok(realm) => HttpResponse::Ok().json(realm),
         Err(e) => {
             log::error!("{:?}", e);
-            HttpResponse::NotFound().finish()
+            let e: ProblemDetails = e.into();
+            HttpResponse::build(e.status_code()).json(e)
         }
     }
 }
@@ -45,7 +51,14 @@ async fn add(realm: web::Json<String>, factory: web::Data<ServiceFactory<'_>>) -
         Ok(realm) => HttpResponse::Ok().json(realm),
         Err(e) => {
             log::error!("{:?}", e);
-            HttpResponse::InternalServerError().finish()
+            let mut e: ProblemDetails = e.into();
+            match e.status_code() {
+                StatusCode::CONFLICT => {
+                    e = e.with_detail("A realm with that name already exists");
+                    HttpResponse::build(e.status_code()).json(e)
+                },
+                _ => HttpResponse::build(e.status_code()).json(e)
+            }
         }
     }
 }

@@ -1821,6 +1821,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "log",
+ "serde",
  "simple-auth-crud",
  "simple-auth-model",
 ]
