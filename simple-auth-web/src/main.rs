@@ -1,4 +1,4 @@
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer, middleware, web};
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
 use simple_auth_web::api::{RealmApi, RegisterApi};
