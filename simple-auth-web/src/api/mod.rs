@@ -3,7 +3,8 @@ use actix_web::web::ServiceConfig;
 use serde::Serialize;
 use crate::di::{ServiceFactory, TransientFactory};
 use crate::dto::ProblemDetails;
-use crate::service::{RoleService, Service};
+use crate::error::ServiceError;
+use crate::service::{Service};
 
 mod realm_api;
 mod role_api;
@@ -21,6 +22,23 @@ impl WebApi for SimpleAuthApi {
     fn register(cfg: &mut ServiceConfig) {
         RealmApi::register(cfg);
         RoleApi::register(cfg);
+    }
+}
+
+struct HttpContext;
+
+impl HttpContext {
+    fn ok<T>(result: Result<T,ServiceError>) -> impl Responder
+        where T: Serialize
+    {
+        match result {
+            Ok(models) => HttpResponse::Ok().json(models),
+            Err(e) => {
+                log::error!("{:?}", e);
+                let e: ProblemDetails = e.into();
+                HttpResponse::build(e.status_code()).json(e)
+            }
+        }
     }
 }
 
