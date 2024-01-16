@@ -1,7 +1,7 @@
-use actix_web::{App, HttpServer, middleware, web};
+use actix_web::{App, HttpServer, web};
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
-use simple_auth_web::api::{RealmApi, RegisterApi};
+use simple_auth_web::api::{SimpleAuthApi, WebApi};
 use simple_auth_web::di::{ServiceFactory, TransientFactory};
 use simple_auth_web::error::ServiceError;
 use simple_auth_web::service::{RealmService, RoleService, UserService};
@@ -51,7 +51,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
        App::new()
            .app_data(provider.clone())
-           .configure(RealmApi::register)
+           .service(web::scope("/api").configure(SimpleAuthApi::register))
     }).bind(("127.0.0.1", 7777))?
         .run()
         .await

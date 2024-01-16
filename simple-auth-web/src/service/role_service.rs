@@ -4,6 +4,7 @@ use simple_auth_crud::DbContext;
 use simple_auth_model::{Realm, Role};
 use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
+use crate::service::Service;
 
 pub struct RoleService<'r> {
     db_context: Arc<DbContext<'r>>
@@ -14,6 +15,16 @@ impl <'r>From<&ServiceFactory<'r>> for RoleService<'r> {
         Self {
             db_context: value.get_singleton::<DbContext>().unwrap(),
         }
+    }
+}
+
+impl <'r>Service<Role> for RoleService<'r> {
+    async fn get_all(&self) -> Result<Vec<Role>, ServiceError> {
+        let crud = self.db_context.get_crud::<RoleCrud>();
+
+        crud.get_all()
+            .await
+            .map_err(|e|ServiceError::from(e))
     }
 }
 

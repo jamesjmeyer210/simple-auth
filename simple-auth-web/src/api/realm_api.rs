@@ -1,14 +1,14 @@
 use actix_web::{get, HttpResponse, post, Responder, web};
 use actix_web::http::StatusCode;
 use actix_web::web::ServiceConfig;
-use crate::api::RegisterApi;
+use crate::api::WebApi;
 use crate::di::{ServiceFactory, TransientFactory};
 use crate::dto::ProblemDetails;
-use crate::service::RealmService;
+use crate::service::{RealmService, Service};
 
 pub struct RealmApi;
 
-impl RegisterApi for RealmApi {
+impl WebApi for RealmApi {
     fn register(cfg: &mut ServiceConfig) {
         cfg.service(get_all);
         cfg.service(get_by_id);
