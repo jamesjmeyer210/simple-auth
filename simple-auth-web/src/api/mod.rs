@@ -1,10 +1,8 @@
 use actix_web::{HttpResponse, Responder, web};
 use actix_web::web::ServiceConfig;
 use serde::Serialize;
-use crate::di::{ServiceFactory, TransientFactory};
 use crate::dto::ProblemDetails;
 use crate::error::ServiceError;
-use crate::service::{Service};
 
 mod realm_api;
 mod role_api;
@@ -32,7 +30,7 @@ impl HttpContext {
         where T: Serialize
     {
         match result {
-            Ok(models) => HttpResponse::Ok().json(models),
+            Ok(model) => HttpResponse::Ok().json(model),
             Err(e) => {
                 log::error!("{:?}", e);
                 let e: ProblemDetails = e.into();
@@ -40,20 +38,12 @@ impl HttpContext {
             }
         }
     }
-}
 
-pub(crate) struct DefaultCrudApi;
-
-impl DefaultCrudApi {
-    pub(crate) async fn get_all<'r,S,M>(factory: &ServiceFactory<'r>) -> impl Responder
-        where
-            S: Service<M> + for<'t> From<&'t ServiceFactory<'r>>,
-            M: Serialize
+    fn accepted<T>(result: Result<T,ServiceError>) -> HttpResponse
+        where T: Serialize
     {
-        let service: S = factory.get_transient();
-
-        match service.get_all().await {
-            Ok(models) => HttpResponse::Ok().json(models),
+        match result {
+            Ok(model) => HttpResponse::Accepted().json(model),
             Err(e) => {
                 log::error!("{:?}", e);
                 let e: ProblemDetails = e.into();

@@ -50,4 +50,10 @@ impl <'r>RoleCrud<'r> {
             .map(|x|x.into())
             .collect())
     }
+
+    pub async fn get_by_id(&self, id: &str) -> Result<Role, sqlx::Error> {
+        self._roles.get_by_id(id)
+            .await
+            .map(|x|x.into())
+    }
 }

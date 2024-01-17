@@ -84,6 +84,7 @@ impl From<ServiceError> for ProblemDetails<'_> {
                     _ => ProblemDetails::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred"),
                 }
             }
+            ServiceError::InvalidArgument => ProblemDetails::new(StatusCode::BAD_REQUEST, "Bad Request")
         }
     }
 }

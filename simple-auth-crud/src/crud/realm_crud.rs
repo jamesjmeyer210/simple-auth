@@ -37,6 +37,14 @@ impl <'r>RealmCrud<'r> {
             .map(|x|x.into())
     }
 
+    pub async fn get_by_names(&self, names: &Vec<String>) -> Result<Vec<Realm>, sqlx::Error> {
+        self._realms.get_by_names(names)
+            .await?
+            .drain(0..)
+            .map(|x|Ok(x.into()))
+            .collect()
+    }
+
     pub async fn contains(&self, realm: &str) -> Result<bool,sqlx::Error> {
         self._realms.count_by_name(realm)
             .await
