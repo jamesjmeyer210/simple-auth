@@ -38,6 +38,20 @@ impl Default for User {
 }
 
 impl User {
+    pub fn new(name: String, password: Password) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            name,
+            password: Some(password),
+            public_key: Vec::with_capacity(0),
+            roles: Vec::with_capacity(1),
+            realms: Vec::with_capacity(1),
+            contact_info: Vec::with_capacity(1),
+            created_on: Utc::now(),
+            deleted_on: None
+        }
+    }
+
     pub fn with_realm(mut self, realm: Realm) -> Self {
         self.realms.push(realm);
         self

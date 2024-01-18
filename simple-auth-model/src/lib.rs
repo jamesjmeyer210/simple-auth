@@ -20,4 +20,5 @@ pub type User = user::User;
 pub type Password = password::Password;
 pub type Email = email::Email;
 pub type ContactInfo = contact_info::ContactInfo;
+pub type ContactValue = contact_info::ContactValue;
 pub type LimitVec<T> = limit_vec::LimitVec<T>;

@@ -38,6 +38,12 @@ impl <'r>UserService<'r> {
         Ok(user)
     }
 
+    pub async fn add(&self, user: User) -> Result<User,ServiceError> {
+        let crud = self.db_context.get_crud::<UserCrud>();
+        crud.add(&user, self.secret_store.as_ref()).await?;
+        Ok(user)
+    }
+
     pub async fn get_by_id(&self, id: &Uuid) -> Result<User,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
         crud.get_by_id(id)

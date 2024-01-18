@@ -34,11 +34,7 @@ impl HttpContext {
     {
         match result {
             Ok(model) => HttpResponse::Ok().json(model),
-            Err(e) => {
-                log::error!("{:?}", e);
-                let e: ProblemDetails = e.into();
-                HttpResponse::build(e.status_code()).json(e)
-            }
+            Err(e) => Self::error_response(e)
         }
     }
 
@@ -47,11 +43,13 @@ impl HttpContext {
     {
         match result {
             Ok(model) => HttpResponse::Accepted().json(model),
-            Err(e) => {
-                log::error!("{:?}", e);
-                let e: ProblemDetails = e.into();
-                HttpResponse::build(e.status_code()).json(e)
-            }
+            Err(e) => Self::error_response(e)
         }
+    }
+
+    fn error_response(error: ServiceError) -> HttpResponse {
+        log::error!("{:?}", error);
+        let e: ProblemDetails = error.into();
+        HttpResponse::build(e.status_code()).json(e)
     }
 }
