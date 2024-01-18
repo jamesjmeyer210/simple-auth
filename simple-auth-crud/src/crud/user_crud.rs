@@ -1,7 +1,8 @@
 use std::sync::Arc;
 use aes_gcm::Aes256Gcm;
 use simple_auth_model::abs::AsBytes;
-use simple_auth_model::User;
+use simple_auth_model::{LimitVec, User};
+use simple_auth_model::uuid::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::crypto::{SecretStore, Sha256Hash};
@@ -27,12 +28,6 @@ impl <'r>From<&DbContext<'r>> for UserCrud<'r> {
 }
 
 impl <'r>UserCrud<'r> {
-    pub async fn contains_by_name(&self, user_name: &str) -> Result<bool,sqlx::Error> {
-        self._users.count_by_name(user_name)
-            .await
-            .map(|x|x == 1)
-    }
-
     pub async fn add<'u>(&self, user: &'u User, secret_store: &SecretStore) -> Result<&'u User,sqlx::Error> {
         let realms: Vec<&String> = user.realms.iter().map(|x|&x.name).collect();
         let roles: Vec<&String> = user.roles.iter().map(|x|&x.name).collect();
@@ -65,5 +60,31 @@ impl <'r>UserCrud<'r> {
         log::debug!("Added {} contacts to user {}", c, &entity.name);
 
         Ok(user)
+    }
+
+    pub async fn contains_by_name(&self, user_name: &str) -> Result<bool,sqlx::Error> {
+        self._users.count_by_name(user_name)
+            .await
+            .map(|x|x == 1)
+    }
+
+    pub async fn get_by_id(&self, id: &Uuid) -> Result<User,sqlx::Error> {
+        self._users.get_by_id(id)
+            .await
+            .map(|x|x.into())
+    }
+
+    pub async fn get_limited_range(&self, limit: u32, offset: u32) -> Result<LimitVec<User>, sqlx::Error> {
+        let total = self._users.count().await?;
+        let users = self._users.get_range(limit, offset)
+            .await?
+            .drain(0..)
+            .map(|x|x.into())
+            .collect();
+
+        Ok(LimitVec {
+            total,
+            data: users,
+        })
     }
 }

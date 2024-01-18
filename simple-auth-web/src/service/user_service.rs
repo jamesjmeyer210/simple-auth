@@ -2,7 +2,8 @@ use std::sync::Arc;
 use simple_auth_crud::crud::UserCrud;
 use simple_auth_crud::crypto::SecretStore;
 use simple_auth_crud::DbContext;
-use simple_auth_model::{ContactInfo, Realm, Role, User};
+use simple_auth_model::{ContactInfo, LimitVec, Realm, Role, User};
+use simple_auth_model::uuid::Uuid;
 use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 
@@ -35,5 +36,19 @@ impl <'r>UserService<'r> {
 
         crud.add(&user, self.secret_store.as_ref()).await?;
         Ok(user)
+    }
+
+    pub async fn get_by_id(&self, id: &Uuid) -> Result<User,ServiceError> {
+        let crud = self.db_context.get_crud::<UserCrud>();
+        crud.get_by_id(id)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
+
+    pub async fn get_page(&self, page: u32) -> Result<LimitVec<User>,ServiceError> {
+        let crud = self.db_context.get_crud::<UserCrud>();
+        crud.get_limited_range(100, page * 100)
+            .await
+            .map_err(|e|ServiceError::from(e))
     }
 }

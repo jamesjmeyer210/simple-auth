@@ -28,6 +28,13 @@ impl <'p>ProblemDetails<'p> {
         }
     }
 
+    pub fn bad_request() -> Self {
+        Self::new(StatusCode::BAD_REQUEST, "Bad Request")
+    }
+    pub fn not_implemented() -> Self {
+        Self::new(StatusCode::NOT_IMPLEMENTED, "Not Implemented")
+    }
+
     pub fn with_detail(mut self, detail: &'p str) -> Self {
         self.detail = Some(detail);
         self
@@ -64,7 +71,7 @@ impl From<ServiceError> for ProblemDetails<'_> {
                         match db_error.kind() {
                             ErrorKind::Other => ProblemDetails::default(),
                             ErrorKind::UniqueViolation => ProblemDetails::new(StatusCode::CONFLICT, "Unique Violation"),
-                            _ => ProblemDetails::new(StatusCode::BAD_REQUEST, "Bad Request")
+                            _ => ProblemDetails::bad_request()
                         }
                     },
                     Error::Io(_) => todo!(),
@@ -84,7 +91,8 @@ impl From<ServiceError> for ProblemDetails<'_> {
                     _ => ProblemDetails::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred"),
                 }
             }
-            ServiceError::InvalidArgument => ProblemDetails::new(StatusCode::BAD_REQUEST, "Bad Request")
+            ServiceError::InvalidArgument => ProblemDetails::bad_request(),
+            ServiceError::NotImplemented => ProblemDetails::not_implemented()
         }
     }
 }

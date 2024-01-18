@@ -6,6 +6,7 @@ use simple_auth_crud::sqlx;
 pub enum ServiceError {
     DbError(sqlx::Error),
     InvalidArgument,
+    NotImplemented,
 }
 
 impl From<sqlx::Error> for ServiceError {

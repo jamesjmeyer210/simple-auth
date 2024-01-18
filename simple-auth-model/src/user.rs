@@ -12,7 +12,7 @@ use crate::role::Role;
 pub struct User {
     pub id: Uuid,
     pub name: String,
-    pub password: Password,
+    pub password: Option<Password>,
     pub contact_info: Vec<ContactInfo>,
     pub public_key: Vec<u8>,
     pub roles: Vec<Role>,
@@ -27,7 +27,7 @@ impl Default for User {
             id: Uuid::new_v4(),
             name: String::from("root"),
             contact_info: vec![],
-            password: Password::try_from("password123").unwrap(),
+            password: Password::try_from("password123").ok(),
             public_key: Vec::with_capacity(0),
             roles: Vec::with_capacity(0),
             realms: Vec::with_capacity(0),

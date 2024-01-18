@@ -7,6 +7,7 @@ mod ip_address;
 pub mod abs;
 mod contact_info;
 mod error;
+mod limit_vec;
 
 // re-exports
 pub use chrono;
@@ -19,3 +20,4 @@ pub type User = user::User;
 pub type Password = password::Password;
 pub type Email = email::Email;
 pub type ContactInfo = contact_info::ContactInfo;
+pub type LimitVec<T> = limit_vec::LimitVec<T>;
