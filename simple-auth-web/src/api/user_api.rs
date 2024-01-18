@@ -62,6 +62,10 @@ async fn get_by_query(query: web::Query<UserQuery>, factory: web::Data<ServiceFa
         let result = service.get_by_name(query.name.as_ref().unwrap()).await;
         return HttpContext::ok(result);
     }
+    if query.contact.is_some() {
+        let result = service.get_by_contact(query.contact.as_ref().unwrap()).await;
+        return HttpContext::ok(result);
+    }
 
     HttpResponse::NotImplemented().finish()
 }
