@@ -74,6 +74,12 @@ impl <'r>UserCrud<'r> {
             .map(|x|x.into())
     }
 
+    pub async fn get_by_name(&self, id: &str) -> Result<User,sqlx::Error> {
+        self._users.get_by_name(id)
+            .await
+            .map(|x|x.into())
+    }
+
     pub async fn get_limited_range(&self, limit: u32, offset: u32) -> Result<LimitVec<User>, sqlx::Error> {
         let total = self._users.count().await?;
         let users = self._users.get_range(limit, offset)

@@ -54,18 +54,14 @@ async fn get_by_query(query: web::Query<UserQuery>, factory: web::Data<ServiceFa
     }
 
     let service: UserService = factory.get_transient();
-    let result = if query.id.is_some() {
-        service.get_by_id(&query.id.unwrap()).await
+    if query.id.is_some() {
+        let result = service.get_by_id(query.id.as_ref().unwrap()).await;
+        return HttpContext::ok(result);
     }
-    else if query.name.is_some() {
-        Err(ServiceError::NotImplemented)
+    if query.name.is_some() {
+        let result = service.get_by_name(query.name.as_ref().unwrap()).await;
+        return HttpContext::ok(result);
     }
-    else if query.contact.is_some() {
-        Err(ServiceError::NotImplemented)
-    }
-    else {
-        unreachable!()
-    };
 
-    HttpContext::ok(result)
+    HttpResponse::NotImplemented().finish()
 }
