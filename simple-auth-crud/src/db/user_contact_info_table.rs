@@ -1,5 +1,6 @@
 use sqlx::{QueryBuilder, Row, Sqlite};
 use simple_auth_model::abs::AsBytes;
+use simple_auth_model::ContactInfo;
 use simple_auth_model::uuid::Uuid;
 use crate::abs::table::Table;
 use crate::crypto::Sha256Hash;
@@ -52,5 +53,16 @@ impl <'r>Table<'r, ContactInfoEntity> {
             .fetch_one(&*self.pool)
             .await
             .map(|row|row.get::<Uuid, &str>("user_id"))
+    }
+
+    pub async fn get_by_user_id(&self, id: &Uuid) -> Result<Vec<ContactInfoEntity>,sqlx::Error> {
+        sqlx::query_as(r#"
+            SELECT `user_id`, `label`, `enc`, `hash`, `verified`, `created_on`, `deleted_on`
+            FROM `users_contact_info`
+            WHERE `user_id` = ?
+            "#)
+            .bind(id)
+            .fetch_all(&*self.pool)
+            .await
     }
 }

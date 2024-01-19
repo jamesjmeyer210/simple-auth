@@ -1,6 +1,7 @@
 use actix_web::{HttpResponse, Responder, web};
 use actix_web::web::ServiceConfig;
 use serde::Serialize;
+use crate::api::auth_api::AuthApi;
 use crate::api::user_api::UserApi;
 use crate::dto::ProblemDetails;
 use crate::error::ServiceError;
@@ -8,6 +9,7 @@ use crate::error::ServiceError;
 mod realm_api;
 mod role_api;
 mod user_api;
+mod auth_api;
 
 type RealmApi = realm_api::RealmApi;
 type RoleApi = role_api::RoleApi;
@@ -23,6 +25,7 @@ impl WebApi for SimpleAuthApi {
         RealmApi::register(cfg);
         RoleApi::register(cfg);
         UserApi::register(cfg);
+        AuthApi::register(cfg);
     }
 }
 

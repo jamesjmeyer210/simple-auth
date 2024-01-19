@@ -1,8 +1,10 @@
 use std::sync::Arc;
 use sqlx::migrate::{MigrateError};
 use sqlx::SqlitePool;
+use simple_auth_model::{ContactInfo, Role, User};
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
+use crate::crud::{RealmCrud, RoleCrud, UserCrud};
 use crate::crypto::{SecretStore, SecretStoreBuilder};
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, SecretEntity, UserEntity};
 
@@ -55,6 +57,26 @@ impl<'r> DbContext<'r> {
     pub async fn get_secret_store(&self) -> Result<SecretStore,sqlx::Error> {
         let builder: SecretStoreBuilder = self.into();
         builder.build().await
+    }
+
+    pub(crate) async fn init_default_unchecked(&self) -> User {
+        let crud = self.get_crud::<RealmCrud>();
+        let realm = crud.add("master").await.unwrap();
+
+        let crud = self.get_crud::<RoleCrud>();
+        let role = Role::default().with_realm(realm);
+        let mut role = crud.add(role).await.unwrap();
+        let realm = role.realms.pop().unwrap();
+
+        let user = User::default()
+            .with_realm(realm)
+            .with_role(role)
+            .with_contact_info(ContactInfo::default());
+
+        let secret_store = self.get_secret_store().await.unwrap();
+        let crud = self.get_crud::<UserCrud>();
+        let _ = crud.add(&user, &secret_store).await.unwrap();
+        return user;
     }
 }
 

@@ -25,7 +25,8 @@ async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError>
 async fn main() -> std::io::Result<()> {
     log4rs::init_file("logcfg.yaml", Default::default()).unwrap();
 
-    let db = DbContext::in_memory().await.unwrap();
+    //let db = DbContext::in_memory().await.unwrap();
+    let db = DbContext::new("db.sqlite").await.unwrap();
 
     let secret_store = (&db).get_secret_store().await;
     if secret_store.is_err() {

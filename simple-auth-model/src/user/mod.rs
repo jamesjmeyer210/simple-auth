@@ -1,3 +1,9 @@
+mod partial_user;
+mod full_user;
+
+pub type PartialUser = partial_user::PartialUser;
+pub type FullUser = full_user::FullUser;
+
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use uuid::Uuid;

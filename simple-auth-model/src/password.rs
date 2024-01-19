@@ -2,7 +2,7 @@ use serde::{Serialize, Serializer};
 use crate::abs::AsBytes;
 
 // TODO: implement custom Debug that protects the password
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, PartialEq)]
 pub struct Password {
     _inner: String,
 }

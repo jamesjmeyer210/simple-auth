@@ -2,6 +2,7 @@ use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::{Password, User};
+use simple_auth_model::user::PartialUser;
 use simple_auth_model::uuid::Uuid;
 use crate::entity::{PasswordHash};
 
@@ -56,6 +57,16 @@ impl Into<User> for UserEntity {
             realms: Vec::with_capacity(0),
             created_on: self.created_on,
             deleted_on: None,
+        }
+    }
+}
+
+impl Into<PartialUser> for UserEntity {
+    fn into(self) -> PartialUser {
+        PartialUser {
+            id: self.id,
+            name: self.name,
+            created_on: self.created_on,
         }
     }
 }

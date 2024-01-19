@@ -1,6 +1,6 @@
 mod realm;
 mod role;
-mod user;
+pub mod user;
 mod password;
 mod email;
 mod ip_address;
@@ -8,6 +8,7 @@ pub mod abs;
 mod contact_info;
 mod error;
 mod limit_vec;
+pub mod jwt;
 
 // re-exports
 pub use chrono;

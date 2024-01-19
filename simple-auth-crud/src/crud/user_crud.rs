@@ -1,11 +1,12 @@
 use std::sync::Arc;
 use aes_gcm::Aes256Gcm;
 use simple_auth_model::abs::AsBytes;
-use simple_auth_model::{LimitVec, User};
+use simple_auth_model::{ContactInfo, ContactValue, LimitVec, Password, User};
+use simple_auth_model::user::{FullUser, PartialUser};
 use simple_auth_model::uuid::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
-use crate::crypto::{SecretStore, Sha256Hash};
+use crate::crypto::{Encrypted, Secret, SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
 
@@ -78,6 +79,31 @@ impl <'r>UserCrud<'r> {
         self.users.get_by_name(id)
             .await
             .map(|x|x.into())
+    }
+
+    pub async fn get_full_by_name(&self, name: &str, password: Password) -> Result<FullUser,sqlx::Error> {
+        let user: PartialUser = self.users.get_by_name(name)
+            .await
+            .map(|x|x.into())?;
+
+        let secret = Secret::try_from(password.as_bytes().to_vec()).unwrap();
+
+        let contact_info: Vec<ContactInfo> = self.contacts.get_by_user_id(&user.id)
+            .await?
+            .drain(0..)
+            .map(|x|{
+                let enc = Encrypted::<Aes256Gcm>::try_from(x.enc).unwrap();
+                let raw: Vec<u8> = enc.decrypt(&secret).unwrap();
+                // TODO: this mapping is incomplete
+                ContactInfo {
+                    verified: x.verified,
+                    label: x.label,
+                    value: ContactValue::Other(String::from_utf8(raw).unwrap())
+                }
+            })
+            .collect();
+
+        todo!()
     }
 
     pub async fn get_by_contact(&self, contact: &str) -> Result<User,sqlx::Error> {
