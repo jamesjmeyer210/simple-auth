@@ -114,10 +114,11 @@ impl <T>TryFrom<Vec<u8>> for Encrypted<T>
     }
 }
 
-pub fn encrypt<T>(data: &[u8], secret: &Secret) -> Result<Encrypted<T>,EncryptionError>
+/// Encrypts the `data` with a `key` and returns an encrypted value of [Encrypted] if the encryption does not fail.
+pub(crate) fn encrypt<T>(data: &[u8], key: &[u8]) -> Result<Encrypted<T>,EncryptionError>
     where T: KeyInit + AeadCore + AeadInPlace
 {
-    let cipher = T::new_from_slice(secret.as_bytes())
+    let cipher = T::new_from_slice(key)
         .map_err(|e|EncryptionError::InvalidLength(e))?;
 
     let nonce = T::generate_nonce(&mut OsRng);
@@ -130,6 +131,7 @@ pub fn encrypt<T>(data: &[u8], secret: &Secret) -> Result<Encrypted<T>,Encryptio
 #[cfg(test)]
 mod test {
     use aes_gcm::Aes256Gcm;
+    use simple_auth_model::abs::AsBytes;
     use crate::crypto::encrypted::{encrypt, Encrypted};
     use crate::crypto::secret::Secret;
 
@@ -137,7 +139,7 @@ mod test {
     fn encrypt_returns_ok() {
         let s = Secret::default();
         let message = b"Lorem ipsum dolor set";
-        let enc = encrypt::<Aes256Gcm>(message, &s);
+        let enc = encrypt::<Aes256Gcm>(message, s.as_bytes());
         assert!(enc.is_ok());
 
         let enc = enc.unwrap();
@@ -155,7 +157,7 @@ mod test {
     fn try_from_returns_ok() {
         let s = Secret::default();
         let message = b"Encrypted message for a database";
-        let enc_a = encrypt::<Aes256Gcm>(message, &s);
+        let enc_a = encrypt::<Aes256Gcm>(message, s.as_bytes());
         assert!(enc_a.is_ok());
 
         let enc_a = enc_a.unwrap();

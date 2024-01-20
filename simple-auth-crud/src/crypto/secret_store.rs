@@ -58,7 +58,7 @@ impl SecretStore {
     pub fn encrypt<T>(&self, data: &[u8]) -> Result<Encrypted<T>,EncryptionError>
         where T: KeyInit + AeadCore + AeadInPlace
     {
-        encrypt(data, self.enc_key())
+        encrypt(data, self.enc_key().as_bytes())
     }
 }
 
@@ -82,7 +82,10 @@ impl <'r>SecretStoreBuilder<'r> {
             fs::write("enc_key",  store.enc_key().as_bytes()).unwrap();
             log::debug!("Wrote encryption key to \"enc_key\"");
 
-            let encrypted = encrypt::<Aes256Gcm>(store.enc_key().as_bytes(), store.enc_key()).unwrap();
+            let encrypted = encrypt::<Aes256Gcm>(
+                store.enc_key().as_bytes(),
+                store.enc_key().as_bytes()
+            ).unwrap();
 
             let _ = self._secrets.add(SecretEntity::new("enc_key", encrypted.into())).await?;
             log::debug!("Added enc_key to database");

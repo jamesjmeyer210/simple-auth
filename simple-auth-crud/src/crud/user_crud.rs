@@ -51,6 +51,7 @@ impl <'r>UserCrud<'r> {
             return Ok(user);
         }
 
+        // TODO: Contact Info should be encrypted by the user password - not a secret
         let contacts = user.contact_info.iter().map(|x|{
             let mut entity = ContactInfoEntity::new(x, &user.id);
             entity.hash = Sha256Hash::from(x.value.as_bytes()).into();
@@ -88,6 +89,7 @@ impl <'r>UserCrud<'r> {
 
         let secret = Secret::try_from(password.as_bytes().to_vec()).unwrap();
 
+        // TODO: complex mappings such as these ought to go somewhere else
         let contact_info: Vec<ContactInfo> = self.contacts.get_by_user_id(&user.id)
             .await?
             .drain(0..)
@@ -103,7 +105,19 @@ impl <'r>UserCrud<'r> {
             })
             .collect();
 
-        todo!()
+        // TODO: break this apart into smaller functions
+        let realms: Vec<String> = self.realms.get_realms_by_user_id(&user.id)
+            .await?
+            .drain(0..)
+            .map(|x|x.name)
+            .collect();
+        // TODO: break this apart into smaller functions
+        let roles: Vec<String> = self.roles.get_roles_by_user_id(&user.id)
+            .await?
+            .drain(0..)
+            .map(|x|x.name)
+            .collect();
+        Ok(FullUser::new(user, contact_info, realms, roles))
     }
 
     pub async fn get_by_contact(&self, contact: &str) -> Result<User,sqlx::Error> {
@@ -126,5 +140,30 @@ impl <'r>UserCrud<'r> {
             total,
             data: users,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use simple_auth_model::Password;
+    use crate::crud::UserCrud;
+    use crate::DbContext;
+
+    #[sqlx::test]
+    async  fn get_full_by_name_returns_user() {
+        let db = DbContext::in_memory().await.unwrap();
+        let user = db.init_default_unchecked().await;
+
+        let crud = db.get_crud::<UserCrud>();
+        let full_user = crud.get_full_by_name(
+            "root",
+            Password::try_from("password123").unwrap()
+        ).await;
+
+        assert!(full_user.is_ok());
+        let full_user = full_user.unwrap();
+
+        assert_eq!(1, full_user.realms.len());
+        assert_eq!(1, full_user.roles.len());
     }
 }
