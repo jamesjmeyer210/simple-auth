@@ -6,6 +6,7 @@ use simple_auth_model::user::{FullUser, PartialUser};
 use simple_auth_model::uuid::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
+use crate::crypto;
 use crate::crypto::{Encrypted, Secret, SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
@@ -55,7 +56,12 @@ impl <'r>UserCrud<'r> {
         let contacts = user.contact_info.iter().map(|x|{
             let mut entity = ContactInfoEntity::new(x, &user.id);
             entity.hash = Sha256Hash::from(x.value.as_bytes()).into();
-            entity.enc = secret_store.encrypt::<Aes256Gcm>(x.value.as_bytes()).unwrap().into();
+            //entity.enc = secret_store.encrypt::<Aes256Gcm>(x.value.as_bytes()).unwrap().into();
+            entity.enc = crypto::encrypt::<Aes256Gcm>(
+                x.value.as_bytes(),
+                user.password.as_ref().unwrap().as_bytes())
+                .unwrap()
+                .into();
             entity
         }).collect();
         let c = self.contacts.add_contacts(&contacts).await?;
@@ -95,7 +101,7 @@ impl <'r>UserCrud<'r> {
             .drain(0..)
             .map(|x|{
                 let enc = Encrypted::<Aes256Gcm>::try_from(x.enc).unwrap();
-                let raw: Vec<u8> = enc.decrypt(&secret).unwrap();
+                let raw: Vec<u8> = enc.decrypt(&secret.as_bytes()).unwrap();
                 // TODO: this mapping is incomplete
                 ContactInfo {
                     verified: x.verified,
