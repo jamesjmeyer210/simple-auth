@@ -5,8 +5,8 @@ use aes_gcm::aead::{Aead, OsRng, Nonce};
 use aes_gcm::aead::rand_core::RngCore;
 use aes_gcm::aes::cipher::{InvalidLength};
 use simple_auth_model::abs::AsBytes;
-use crate::crypto::encryption_error::DecryptionError;
-use crate::crypto::{EncryptionError, EncryptionKey, PasswordHash};
+use crate::error::encryption_error::DecryptionError;
+use crate::crypto::{EncryptionError, PasswordHash};
 use crate::crypto::secret::Secret;
 
 pub struct Encrypted<T: KeyInit + AeadCore + AeadInPlace> {
@@ -55,10 +55,13 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
         self.nonce.len() + self.bytes.len()
     }
 
-    pub fn decrypt<D>(&self, key: &Secret) -> Result<D,DecryptionError>
+    pub fn decrypt<D>(&self, key: &[u8]) -> Result<D,DecryptionError>
         where D : TryFrom<Vec<u8>>
     {
-        let cipher = T::new_from_slice(key.as_bytes())
+        let derivative = PasswordHash::u8_from_bytes(key, &self.salt)
+            .map_err(|e|DecryptionError::Argon2Error(e))?;
+
+        let cipher = T::new_from_slice(&derivative)
             .map_err(|e|DecryptionError::InvalidLength(e))?;
 
         let x = cipher.decrypt(&self.nonce, self.bytes.as_ref())
@@ -163,7 +166,7 @@ mod test {
         let enc = enc.unwrap();
         assert!(message.len() < enc.len());
 
-        let dec = enc.decrypt::<Vec<u8>>(&s);
+        let dec = enc.decrypt::<Vec<u8>>(s.as_bytes());
 
         assert!(dec.is_ok());
         let dec = dec.unwrap();
@@ -178,8 +181,7 @@ mod test {
 
         let data = b"user123@localhost.email";
         let enc = encrypt::<Aes256Gcm>(data, p.as_bytes());
-        println!("{:?}", enc.unwrap_err());
-        //assert!(enc.is_ok());
+        assert!(enc.is_ok());
     }
 
     #[test]

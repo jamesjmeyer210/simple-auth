@@ -36,10 +36,15 @@ impl PasswordHash {
         vec
     }
 
-    pub(crate) fn verify(&self, password: &Password) -> Result<bool,argon2::Error> {
+    pub(crate) fn u8_from_bytes(password: &[u8], salt: &[u8;16]) -> Result<[u8;32],argon2::Error> {
         let argon2 = Argon2::default();
         let mut hash = [0u8;Self::HASH_LEN];
-        argon2.hash_password_into(password.as_bytes(), &self.salt, &mut hash)?;
+        argon2.hash_password_into(password, salt, &mut hash)?;
+        Ok(hash)
+    }
+
+    pub(crate) fn verify(&self, password: &Password) -> Result<bool,argon2::Error> {
+        let hash = Self::u8_from_bytes(password.as_bytes(), &self.salt)?;
         Ok(hash == self.hash)
     }
 }

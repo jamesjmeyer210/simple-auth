@@ -97,7 +97,7 @@ impl <'r>SecretStoreBuilder<'r> {
             let key = fs::read("enc_key").unwrap();
             let encrypted_key = Secret::try_from(key).unwrap();
 
-            let decrypted_secret = encrypted.decrypt::<Secret>(&encrypted_key).unwrap();
+            let decrypted_secret = encrypted.decrypt::<Secret>(&encrypted_key.as_bytes()).unwrap();
 
             store.set_enc_key(decrypted_secret);
         }
@@ -105,7 +105,7 @@ impl <'r>SecretStoreBuilder<'r> {
         if self._secrets.contains("sig_key").await? {
             let sig_key_enc = self._secrets.get("sig_key").await?;
             let encrypted = Encrypted::<Aes256Gcm>::try_from(sig_key_enc.value_enc).unwrap();
-            let sig_key = encrypted.decrypt::<Secret>(store.enc_key()).unwrap();
+            let sig_key = encrypted.decrypt::<Secret>(store.enc_key().as_bytes()).unwrap();
             store.set_sig_key(sig_key);
         }
 

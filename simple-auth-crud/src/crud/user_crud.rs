@@ -10,6 +10,7 @@ use crate::crypto;
 use crate::crypto::{Encrypted, Secret, SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
+use crate::error::CrudError;
 
 pub struct UserCrud<'r> {
     users: Arc<Table<'r, UserEntity>>,
@@ -88,12 +89,18 @@ impl <'r>UserCrud<'r> {
             .map(|x|x.into())
     }
 
-    pub async fn get_full_by_name(&self, name: &str, password: Password) -> Result<FullUser,sqlx::Error> {
-        let user: PartialUser = self.users.get_by_name(name)
-            .await
-            .map(|x|x.into())?;
+    pub async fn get_full_by_name(&self, name: &str, password: Password) -> Result<FullUser,CrudError> {
+        let entity: UserEntity = self.users.get_by_name(name).await?;
+        if !entity.password.is_some() {
+            return Err(CrudError::ValueIsNone);
+        }
 
-        let secret = Secret::try_from(password.as_bytes().to_vec()).unwrap();
+        let hash = entity.password.as_ref().unwrap();
+        if !hash.verify(&password)? {
+            return Err(CrudError::PasswordMismatch);
+        }
+
+        let user: PartialUser = entity.into();
 
         // TODO: complex mappings such as these ought to go somewhere else
         let contact_info: Vec<ContactInfo> = self.contacts.get_by_user_id(&user.id)
@@ -101,7 +108,7 @@ impl <'r>UserCrud<'r> {
             .drain(0..)
             .map(|x|{
                 let enc = Encrypted::<Aes256Gcm>::try_from(x.enc).unwrap();
-                let raw: Vec<u8> = enc.decrypt(&secret.as_bytes()).unwrap();
+                let raw: Vec<u8> = enc.decrypt(password.as_bytes()).unwrap();
                 // TODO: this mapping is incomplete
                 ContactInfo {
                     verified: x.verified,

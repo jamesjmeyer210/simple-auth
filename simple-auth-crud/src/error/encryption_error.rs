@@ -11,5 +11,6 @@ pub enum EncryptionError {
 #[derive(Debug)]
 pub enum DecryptionError {
     InvalidLength(InvalidLength),
-    DecryptionFailed
+    DecryptionFailed,
+    Argon2Error(argon2::Error)
 }

@@ -4,7 +4,7 @@ use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::{Password, User};
 use simple_auth_model::user::PartialUser;
 use simple_auth_model::uuid::Uuid;
-use crate::entity::{PasswordHash};
+use crate::crypto::{PasswordHash};
 
 pub(crate) struct UserEntity {
     pub id: Uuid,

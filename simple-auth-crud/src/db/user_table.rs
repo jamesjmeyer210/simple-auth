@@ -10,7 +10,7 @@ impl<'r> Table<'r, UserEntity> {
             VALUES(?, ?, ?, ?, ?)"#)
             .bind(&model.id)
             .bind(&model.name)
-            .bind(&model.password.as_ref().map(|x|x.as_bytes()))
+            .bind(&model.password.as_ref().map(|p|p.to_vec()))
             .bind(&model.created_on)
             .bind(&model.deleted_on)
             .execute(&*self.pool)
