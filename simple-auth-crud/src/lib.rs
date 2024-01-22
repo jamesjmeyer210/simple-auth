@@ -3,7 +3,7 @@ mod entity;
 mod db;
 pub mod crud;
 pub mod crypto;
-mod error;
+pub mod error;
 
 // Re-exports
 pub use sqlx;
