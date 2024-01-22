@@ -5,14 +5,14 @@ use crate::crypto::abs::AsHash;
 use crate::crypto::sha_256_hash::Sha256Hash;
 
 pub struct Secret {
-    _key: [u8;32]
+    key: [u8;32]
 }
 
 impl Default for Secret {
     fn default() -> Self {
         let key = Aes256Gcm::generate_key(OsRng);
         Self {
-            _key: key.try_into().unwrap()
+            key: key.try_into().unwrap()
         }
     }
 }
@@ -22,20 +22,20 @@ impl TryFrom<Vec<u8>> for Secret {
 
     fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
         Ok(Self {
-            _key: value.try_into()?
+            key: value.try_into()?
         })
     }
 }
 
 impl AsHash<Sha256Hash> for Secret {
     fn as_hash(&self) -> Sha256Hash {
-        Sha256Hash::from(self._key.as_ref())
+        Sha256Hash::from(self.key.as_ref())
     }
 }
 
 impl AsBytes for Secret {
     fn as_bytes(&self) -> &[u8] {
-        self._key.as_ref()
+        self.key.as_ref()
     }
 }
 
