@@ -11,3 +11,13 @@ impl AsBytes for String {
         self.as_bytes()
     }
 }
+
+pub trait AsJson {
+    fn as_json(&self) -> Result<String,serde_json::Error>;
+}
+
+impl <T>AsJson for T where T: serde::Serialize {
+    fn as_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
+}

@@ -27,6 +27,9 @@ async fn main() -> std::io::Result<()> {
 
     //let db = DbContext::in_memory().await.unwrap();
     let db = DbContext::new("db.sqlite").await.unwrap();
+    db.migrate()
+        .await
+        .expect("ERROR: Migration failed");
 
     let secret_store = (&db).get_secret_store().await;
     if secret_store.is_err() {

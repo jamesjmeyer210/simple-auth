@@ -2,8 +2,11 @@ use std::sync::Arc;
 use simple_auth_crud::crud::UserCrud;
 use simple_auth_crud::crypto::SecretStore;
 use simple_auth_crud::DbContext;
-use simple_auth_model::jwt::Jwt;
+use simple_auth_model::abs::AsJson;
+use simple_auth_model::chrono::Utc;
+use simple_auth_model::jwt::{JwtClaims, Jwt, JwtHeader};
 use simple_auth_model::Password;
+use crate::di::ServiceFactory;
 use crate::error::ServiceError;
 
 pub struct AuthService<'r> {
@@ -11,21 +14,33 @@ pub struct AuthService<'r> {
     secret_store: Arc<SecretStore>,
 }
 
+impl <'r>From<&ServiceFactory<'r>> for AuthService<'r> {
+    fn from(value: &ServiceFactory<'r>) -> Self {
+        Self {
+            db_context: value.get_singleton::<DbContext>().unwrap(),
+            secret_store: value.get_singleton::<SecretStore>().unwrap(),
+        }
+    }
+}
+
 impl <'r>AuthService<'r> {
     pub async fn get_jwt(&self, user_name: String, password: Password) -> Result<Jwt,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
-        let user = crud.get_by_name(&user_name)
-            .await
-            .map_err(|e|ServiceError::from(e))?;
+        let user = crud.get_full_by_name(&user_name, password).await?;
 
-        let valid_pass = match &user.password {
-            None => false,
-            Some(user_pass) => user_pass == &password
+        let claims = JwtClaims {
+            name: user.name,
+            roles: user.roles,
+            realms: user.realms,
+            auth_time: Utc::now(),
         };
-        if !valid_pass {
-            return Err(ServiceError::InvalidArgument);
-        }
+        let header = JwtHeader::default();
+        let signature = self.secret_store.sign_jwt(&header.as_json().unwrap(), &claims.as_json().unwrap());
 
-        todo!()
+        Ok(Jwt {
+            header,
+            claims,
+            signature,
+        })
     }
 }
