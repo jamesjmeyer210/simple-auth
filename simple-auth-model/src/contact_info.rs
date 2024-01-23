@@ -19,6 +19,16 @@ impl Default for ContactInfo {
     }
 }
 
+impl ContactInfo {
+    pub fn try_new(label: &str, value: &str) -> Result<ContactInfo,&'static str> {
+        Ok(Self {
+            verified: false,
+            label: label.to_string(),
+            value: ContactValue::try_new(label, value)?
+        })
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub enum ContactValue {
     Email(Email),
@@ -30,6 +40,15 @@ impl AsBytes for ContactValue {
         match self {
             Self::Email(x) => x.as_bytes(),
             Self::Other(x) => x.as_bytes()
+        }
+    }
+}
+
+impl ContactValue {
+    pub fn try_new(label: &str, value: &str) -> Result<ContactValue, &'static str> {
+        match label {
+            "email" => Ok(Self::Email(Email::try_from(value)?)),
+            _ => Ok(Self::Other(value.to_string()))
         }
     }
 }

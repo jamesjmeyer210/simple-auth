@@ -2,8 +2,9 @@ use sqlx::{Error, FromRow, Row};
 use sqlx::sqlite::SqliteRow;
 use simple_auth_model::chrono::{DateTime, Utc};
 use simple_auth_model::{Password, User};
+use simple_auth_model::user::PartialUser;
 use simple_auth_model::uuid::Uuid;
-use crate::entity::{PasswordHash};
+use crate::crypto::{PasswordHash};
 
 pub(crate) struct UserEntity {
     pub id: Uuid,
@@ -34,9 +35,38 @@ impl From<&User> for UserEntity {
         Self {
             id: value.id,
             name: value.name.clone(),
-            password: PasswordHash::try_from(&value.password).ok(),
+            password: value.password
+                .as_ref()
+                .map(|p|PasswordHash::try_from(p))
+                .and_then(|x|x.ok()),
             created_on: value.created_on,
             deleted_on: value.deleted_on
+        }
+    }
+}
+
+impl Into<User> for UserEntity {
+    fn into(self) -> User {
+        User {
+            id: self.id,
+            name: self.name,
+            password: None,
+            contact_info: Vec::with_capacity(0),
+            public_key: Vec::with_capacity(0),
+            roles: Vec::with_capacity(0),
+            realms: Vec::with_capacity(0),
+            created_on: self.created_on,
+            deleted_on: None,
+        }
+    }
+}
+
+impl Into<PartialUser> for UserEntity {
+    fn into(self) -> PartialUser {
+        PartialUser {
+            id: self.id,
+            name: self.name,
+            created_on: self.created_on,
         }
     }
 }

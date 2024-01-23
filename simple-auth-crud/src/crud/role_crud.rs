@@ -42,4 +42,18 @@ impl <'r>RoleCrud<'r> {
 
         Ok(model)
     }
+
+    pub async fn get_all(&self) -> Result<Vec<Role>,sqlx::Error> {
+        Ok(self._roles.all()
+            .await?
+            .drain(0..)
+            .map(|x|x.into())
+            .collect())
+    }
+
+    pub async fn get_by_id(&self, id: &str) -> Result<Role, sqlx::Error> {
+        self._roles.get_by_id(id)
+            .await
+            .map(|x|x.into())
+    }
 }

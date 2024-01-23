@@ -1,3 +1,4 @@
+use simple_auth_model::uuid::Uuid;
 use crate::abs::table::Table;
 use crate::entity::{Count, UserEntity};
 
@@ -9,12 +10,19 @@ impl<'r> Table<'r, UserEntity> {
             VALUES(?, ?, ?, ?, ?)"#)
             .bind(&model.id)
             .bind(&model.name)
-            .bind(&model.password.as_ref().map(|x|x.as_bytes()))
+            .bind(&model.password.as_ref().map(|p|p.to_vec()))
             .bind(&model.created_on)
             .bind(&model.deleted_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
+    }
+
+    pub async fn count(&self) -> Result<u32, sqlx::Error> {
+        sqlx::query_as("SELECT COUNT(*) FROM `users` as `a` WHERE `a`.`deleted_on` IS NULL")
+            .fetch_one(&*self.pool)
+            .await
+            .map(|x: Count|x.into())
     }
 
     pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
@@ -36,6 +44,44 @@ impl<'r> Table<'r, UserEntity> {
             WHERE `a`.`deleted_on` IS NULL
             "#,)
             .fetch_all(&*self.pool)
+            .await
+    }
+
+    pub async fn get_range(&self, limit: u32, offset: u32) -> Result<Vec<UserEntity>, sqlx::Error> {
+        sqlx::query_as(
+            r#"
+            SELECT `id`, `name`, `password`, `created_on`, `deleted_on`
+            FROM `users` as `a`
+            WHERE `a`.`deleted_on` IS NULL
+            LIMIT ? OFFSET ?
+            "#,)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(&*self.pool)
+            .await
+    }
+
+    pub async fn get_by_id(&self, id: &Uuid) -> Result<UserEntity, sqlx::Error> {
+        sqlx::query_as(
+            r#"
+            SELECT `id`, `name`, `password`, `created_on`, `deleted_on`
+            FROM `users` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`id` = ?
+            "#,)
+            .bind(id)
+            .fetch_one(&*self.pool)
+            .await
+    }
+
+    pub async fn get_by_name(&self, name: &str) -> Result<UserEntity, sqlx::Error> {
+        sqlx::query_as(
+            r#"
+            SELECT `id`, `name`, `password`, `created_on`, `deleted_on`
+            FROM `users` as `a`
+            WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
+            "#,)
+            .bind(name)
+            .fetch_one(&*self.pool)
             .await
     }
 }

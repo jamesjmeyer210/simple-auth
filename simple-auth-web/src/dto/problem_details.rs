@@ -28,6 +28,16 @@ impl <'p>ProblemDetails<'p> {
         }
     }
 
+    pub fn bad_request() -> Self {
+        Self::new(StatusCode::BAD_REQUEST, "Bad Request")
+    }
+    pub fn not_implemented() -> Self {
+        Self::new(StatusCode::NOT_IMPLEMENTED, "Not Implemented")
+    }
+    pub fn internal_server_error() -> Self {
+        Self::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred")
+    }
+
     pub fn with_detail(mut self, detail: &'p str) -> Self {
         self.detail = Some(detail);
         self
@@ -64,7 +74,7 @@ impl From<ServiceError> for ProblemDetails<'_> {
                         match db_error.kind() {
                             ErrorKind::Other => ProblemDetails::default(),
                             ErrorKind::UniqueViolation => ProblemDetails::new(StatusCode::CONFLICT, "Unique Violation"),
-                            _ => ProblemDetails::new(StatusCode::BAD_REQUEST, "Bad Request")
+                            _ => ProblemDetails::bad_request()
                         }
                     },
                     Error::Io(_) => todo!(),
@@ -81,9 +91,12 @@ impl From<ServiceError> for ProblemDetails<'_> {
                     Error::PoolClosed => todo!(),
                     Error::WorkerCrashed => todo!(),
                     Error::Migrate(_) => todo!(),
-                    _ => ProblemDetails::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred"),
+                    _ => Self::internal_server_error(),
                 }
             }
+            ServiceError::InvalidArgument => ProblemDetails::bad_request(),
+            ServiceError::NotImplemented => ProblemDetails::not_implemented(),
+            ServiceError::InternalAppError => Self::internal_server_error(),
         }
     }
 }

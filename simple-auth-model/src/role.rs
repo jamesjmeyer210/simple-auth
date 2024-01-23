@@ -22,6 +22,16 @@ impl Default for Role {
 }
 
 impl Role {
+    pub fn new(name: String, max: Option<u32>, realms: Vec<Realm>) -> Self
+    {
+        Self {
+            name,
+            max,
+            realms,
+            created_on: Utc::now(),
+        }
+    }
+
     pub fn with_realm(mut self, realm: Realm) -> Self {
         self.realms.push(realm);
         self

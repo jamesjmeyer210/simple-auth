@@ -19,7 +19,7 @@ impl<'r> Table<'r, RoleEntity> {
 
     pub async fn count_by_name(&self, name: &str) -> Result<u32, sqlx::Error> {
         sqlx::query_as(r#"
-            SELECT COUNT(*) FROM `roles` as `a`
+            SELECT COUNT(*) FROM `roles` AS `a`
             WHERE `a`.`deleted_on` IS NULL AND `a`.`name` = ?
             "#)
             .bind(name)
@@ -36,6 +36,18 @@ impl<'r> Table<'r, RoleEntity> {
             WHERE `deleted_on` IS NULL
             "#,)
             .fetch_all(&*self.pool)
+            .await
+    }
+
+    pub async fn get_by_id(&self, id: &str) -> Result<RoleEntity, sqlx::Error> {
+        sqlx::query_as(
+            r#"
+            SELECT `name`, `max`, `created_on`, `deleted_on`
+            FROM `roles` AS `a`
+            WHERE `deleted_on` IS NULL AND `a`.`name` = ?
+            "#,)
+            .bind(id)
+            .fetch_one(&*self.pool)
             .await
     }
 }

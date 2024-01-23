@@ -32,6 +32,17 @@ impl From<&Role> for RoleEntity {
     }
 }
 
+impl Into<Role> for RoleEntity {
+    fn into(self) -> Role {
+        Role {
+            name: self.name,
+            max: self.max,
+            created_on: self.created_on,
+            realms: Vec::with_capacity(0),
+        }
+    }
+}
+
 impl <'r>FromRow<'r, SqliteRow> for RoleEntity {
     fn from_row(row: &'r SqliteRow) -> Result<Self, Error> {
         Ok(Self {
