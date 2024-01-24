@@ -31,12 +31,18 @@ impl <'p>ProblemDetails<'p> {
         }
     }
 
+    pub fn unauthorized() -> Self {
+        Self::new(StatusCode::UNAUTHORIZED, "Unauthorized")
+    }
+
     pub fn bad_request() -> Self {
         Self::new(StatusCode::BAD_REQUEST, "Bad Request")
     }
+
     pub fn not_implemented() -> Self {
         Self::new(StatusCode::NOT_IMPLEMENTED, "Not Implemented")
     }
+
     pub fn internal_server_error() -> Self {
         Self::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred")
     }

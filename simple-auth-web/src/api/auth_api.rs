@@ -14,7 +14,7 @@ impl WebApi for AuthApi {
     }
 }
 
-#[post("auth/login")]
+#[post("token")]
 async fn login(dto: web::Json<PasswordLoginDto>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
     let dto = dto.into_inner();
 

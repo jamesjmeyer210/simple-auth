@@ -42,3 +42,14 @@ pub struct JwtClaims {
     pub realms: Vec<String>,
     pub auth_time: DateTime<Utc>,
 }
+
+impl Default for JwtClaims {
+    fn default() -> Self {
+        Self {
+            name: String::from("root"),
+            roles: vec!["root".to_string()],
+            realms: vec!["master".to_string()],
+            auth_time: Utc::now(),
+        }
+    }
+}

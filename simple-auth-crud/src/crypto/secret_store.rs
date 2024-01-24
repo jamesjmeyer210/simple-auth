@@ -4,6 +4,7 @@ use std::fs;
 use std::sync::Arc;
 use aes_gcm::{aead::{KeyInit}, AeadCore, AeadInPlace, Aes256Gcm};
 use simple_auth_model::abs::{AsBytes, AsJson};
+use simple_auth_model::encoding::JwtByteParts;
 use simple_auth_model::jwt::{JwtClaims, JwtHeader};
 use crate::abs::table::Table;
 use crate::crypto::encrypted::{encrypt, Encrypted};
@@ -58,6 +59,26 @@ impl SecretStore {
         self.inner.sig_key = secret;
     }
 
+    fn sha256_sign_jwt(&self, header: &[u8], claims: &[u8]) -> Sha256Hash {
+        let secret = self.inner.sig_key.as_bytes();
+        let mut bytes = Vec::with_capacity(header.len() + claims.len() + secret.len() + 2);
+        for i in header {
+            bytes.push(*i);
+        }
+        bytes.push(b'.');
+
+        for i in claims {
+            bytes.push(*i);
+        }
+        bytes.push(b'.');
+
+        for i in secret {
+            bytes.push(*i);
+        }
+
+        Sha256Hash::from(bytes.as_slice())
+    }
+
     /// Encrypts any `data` with the internal encryption key
     pub fn encrypt<T>(&self, data: &[u8]) -> Result<Encrypted<T>,EncryptionError>
         where T: KeyInit + AeadCore + AeadInPlace
@@ -66,27 +87,14 @@ impl SecretStore {
     }
 
     /// Returns a JWT signature
-    pub fn sign_jwt(&self, header: &String, claims: &String) -> Vec<u8> {
-        let hb = header.as_bytes();
-        let cb = claims.as_bytes();
-        let sb = self.inner.sig_key.as_bytes();
+    pub fn sign_jwt(&self, header: &str, claims: &str) -> Vec<u8> {
+        self.sha256_sign_jwt(header.as_bytes(), claims.as_bytes()).into()
+    }
 
-        let mut bytes = Vec::with_capacity(hb.len() + cb.len() + sb.len() + 2);
-        for i in hb {
-            bytes.push(*i);
-        }
-        bytes.push(b'.');
-
-        for i in cb {
-            bytes.push(*i);
-        }
-        bytes.push(b'.');
-
-        for i in sb {
-            bytes.push(*i);
-        }
-
-        Sha256Hash::from(bytes.as_slice()).into()
+    /// Validates the signature within `parts` against the internal signing key
+    pub fn validate_jwt(&self, parts: &JwtByteParts) -> bool {
+        let hash: Vec<u8> = self.sha256_sign_jwt(parts.header.as_slice(), parts.claims.as_slice()).into();
+        hash == parts.sig
     }
 }
 
@@ -143,15 +151,37 @@ impl <'r>SecretStoreBuilder<'r> {
 
 #[cfg(test)]
 mod test {
+    use simple_auth_model::abs::AsJson;
+    use simple_auth_model::encoding::JwtStr;
+    use simple_auth_model::jwt::{Jwt, JwtClaims, JwtHeader};
     use crate::DbContext;
-    use super::SecretStoreBuilder;
+    use super::{SecretStore, SecretStoreBuilder};
 
     #[sqlx::test]
-    async  fn build_returns_ok() {
+    async fn build_returns_ok() {
         let db = DbContext::in_memory().await.unwrap();
         let builder: SecretStoreBuilder = (&db).into();
 
         let store = builder.build().await;
         assert!(store.is_ok());
+    }
+
+    #[test]
+    fn validate_jwt_returns_true() {
+        let store = SecretStore::default();
+        let header = JwtHeader::default();
+        let claims = JwtClaims::default();
+        let signature = store.sign_jwt(header.as_json().unwrap().as_str(), claims.as_json().unwrap().as_str());
+
+        let jwt = Jwt {
+            header,
+            claims,
+            signature,
+        };
+
+        let encoded_jwt = jwt.to_base64_string();
+        println!("JWT: {}", &encoded_jwt);
+        let parts = JwtStr::try_from(encoded_jwt.as_str()).unwrap().into_parts().into();
+        assert!(store.validate_jwt(&parts))
     }
 }
