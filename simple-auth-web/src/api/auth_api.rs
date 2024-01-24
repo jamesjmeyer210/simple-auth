@@ -1,5 +1,5 @@
 use actix_web::{HttpResponse, post, Responder, web};
-use actix_web::web::{service, ServiceConfig};
+use actix_web::web::{ServiceConfig};
 use simple_auth_model::Password;
 use crate::api::{HttpContext, WebApi};
 use crate::di::{ServiceFactory, TransientFactory};
