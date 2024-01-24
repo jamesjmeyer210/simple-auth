@@ -18,13 +18,20 @@ pub trait WebApi {
     fn register(cfg: &mut web::ServiceConfig);
 }
 
-pub struct SimpleAuthApi;
+pub struct SimpleAuthApiV1;
 
-impl WebApi for SimpleAuthApi {
+impl WebApi for SimpleAuthApiV1 {
     fn register(cfg: &mut ServiceConfig) {
         RealmApi::register(cfg);
         RoleApi::register(cfg);
         UserApi::register(cfg);
+    }
+}
+
+pub struct OAuthApiV1;
+
+impl WebApi for OAuthApiV1 {
+    fn register(cfg: &mut ServiceConfig) {
         AuthApi::register(cfg);
     }
 }

@@ -1,9 +1,11 @@
 use std::sync::Arc;
+use actix_web::http::header::HeaderValue;
 use simple_auth_crud::crud::UserCrud;
 use simple_auth_crud::crypto::SecretStore;
 use simple_auth_crud::DbContext;
 use simple_auth_model::abs::AsJson;
 use simple_auth_model::chrono::Utc;
+use simple_auth_model::encoding::JwtStr;
 use simple_auth_model::jwt::{JwtClaims, Jwt, JwtHeader};
 use simple_auth_model::Password;
 use crate::di::ServiceFactory;
@@ -42,5 +44,13 @@ impl <'r>AuthService<'r> {
             claims,
             signature,
         })
+    }
+
+    pub fn validate_jwt(&self, bearer_token: &str) -> bool {
+        let jwt = JwtStr::try_from(bearer_token)
+            .unwrap()
+            .into_parts()
+            .into();
+        self.secret_store.validate_jwt(&jwt)
     }
 }

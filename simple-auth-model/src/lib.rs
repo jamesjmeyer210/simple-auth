@@ -8,7 +8,10 @@ pub mod abs;
 mod contact_info;
 mod error;
 mod limit_vec;
+
+// public modules
 pub mod jwt;
+pub mod encoding;
 
 // re-exports
 pub use chrono;

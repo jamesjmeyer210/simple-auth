@@ -130,7 +130,7 @@ impl <'r>UserCrud<'r> {
             .drain(0..)
             .map(|x|x.name)
             .collect();
-        Ok(FullUser::new(user, contact_info, realms, roles))
+        Ok(FullUser::new(user, contact_info, roles, realms))
     }
 
     pub async fn get_by_contact(&self, contact: &str) -> Result<User,sqlx::Error> {

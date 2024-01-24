@@ -1,8 +1,11 @@
+use std::fmt::{Display, Formatter};
 use actix_web::http::{StatusCode};
+use actix_web::ResponseError;
 use serde::Serialize;
 use simple_auth_crud::sqlx::Error;
 use simple_auth_crud::sqlx::error::ErrorKind;
 use simple_auth_model::uuid::Uuid;
+use simple_auth_model::abs::AsJson;
 use crate::error::ServiceError;
 
 #[derive(Debug, Serialize)]
@@ -28,12 +31,18 @@ impl <'p>ProblemDetails<'p> {
         }
     }
 
+    pub fn unauthorized() -> Self {
+        Self::new(StatusCode::UNAUTHORIZED, "Unauthorized")
+    }
+
     pub fn bad_request() -> Self {
         Self::new(StatusCode::BAD_REQUEST, "Bad Request")
     }
+
     pub fn not_implemented() -> Self {
         Self::new(StatusCode::NOT_IMPLEMENTED, "Not Implemented")
     }
+
     pub fn internal_server_error() -> Self {
         Self::new(StatusCode::INTERNAL_SERVER_ERROR, "An unknown error occurred")
     }
@@ -99,4 +108,14 @@ impl From<ServiceError> for ProblemDetails<'_> {
             ServiceError::InternalAppError => Self::internal_server_error(),
         }
     }
+}
+
+impl Display for ProblemDetails<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_json().unwrap())
+    }
+}
+
+impl ResponseError for ProblemDetails<'_> {
+
 }
