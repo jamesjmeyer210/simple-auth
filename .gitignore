@@ -12,3 +12,6 @@ log
 
 # crypto
 enc_key
+
+# startup banner
+.banner
