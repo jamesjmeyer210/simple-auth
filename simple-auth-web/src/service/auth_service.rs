@@ -46,10 +46,8 @@ impl <'r>AuthService<'r> {
         })
     }
 
-    pub fn validate_jwt(&self, bearer_token: &HeaderValue) -> bool {
-        let token = bearer_token.to_str().unwrap();
-        let encoded = token.replace("Bearer ", "");
-        let jwt = JwtStr::try_from(encoded.as_str())
+    pub fn validate_jwt(&self, bearer_token: &str) -> bool {
+        let jwt = JwtStr::try_from(bearer_token)
             .unwrap()
             .into_parts()
             .into();

@@ -11,9 +11,6 @@ pub struct SimpleAuthMiddleware;
 impl SimpleAuthMiddleware {
     pub async fn authenticate_bearer(req: ServiceRequest, credentials: BearerAuth) -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)>
     {
-        //TODO: use `credentials.token()` instead of manually getting the header
-        let header = req.headers().get("Authorization").unwrap();
-
         let factory: Option<&Data<ServiceFactory>> = req.app_data::<Data<ServiceFactory>>();
         if factory.is_none() {
             log::info!("Factory is none");
@@ -21,11 +18,10 @@ impl SimpleAuthMiddleware {
                 actix_web::Error::from(ProblemDetails::bad_request()),
                 req));
         }
-        log::info!("Factory exists!");
 
         let factory = factory.unwrap();
         let auth_service: AuthService = factory.get_transient();
-        match auth_service.validate_jwt(header) {
+        match auth_service.validate_jwt(credentials.token()) {
             true => Ok(req),
             _ => {
                 let config = req.app_data::<bearer::Config>()
