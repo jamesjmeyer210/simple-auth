@@ -2,6 +2,7 @@ mod problem_details;
 mod role_dto;
 mod user_dto;
 mod auth_dto;
+pub(crate) mod oauth;
 
 pub type ProblemDetails<'p> = problem_details::ProblemDetails<'p>;
 pub(crate) type AddRoleDto = role_dto::AddRoleDto;
