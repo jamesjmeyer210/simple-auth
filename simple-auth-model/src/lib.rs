@@ -12,6 +12,7 @@ mod limit_vec;
 // public modules
 pub mod jwt;
 pub mod encoding;
+mod config;
 
 // re-exports
 pub use chrono;
