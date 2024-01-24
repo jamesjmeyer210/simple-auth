@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct ServerConfig {
     pub domain: String,
     pub port: u16,
-    pub workers: Option<u16>
+    pub workers: Option<usize>
 }
 
 impl Default for ServerConfig {

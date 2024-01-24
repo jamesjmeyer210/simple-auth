@@ -65,7 +65,7 @@ async fn main() -> std::io::Result<()> {
 
     let provider = web::Data::new(factory);
 
-    HttpServer::new(move || {
+    let mut server = HttpServer::new(move || {
         let authentication_middleware = HttpAuthentication::bearer(SimpleAuthMiddleware::authenticate_bearer);
         App::new()
             .app_data(provider.clone())
@@ -78,7 +78,13 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/v1/oauth")
                     .configure(OAuthApiV1::register)
             )
-    }).bind(("127.0.0.1", 7777))?
+    });
+
+    if config.server.workers.is_some() {
+        server = server.workers(config.server.workers.clone().unwrap());
+    }
+
+    server.bind((config.server.domain.as_str(), config.server.port))?
         .run()
         .await
 }
