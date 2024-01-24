@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum DatabaseConfig {
     Sqlite(SqliteConfig)
 }
@@ -21,7 +21,7 @@ impl PartialEq for DatabaseConfig {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum SqliteConfig {
     InMemory,
     Path(String)

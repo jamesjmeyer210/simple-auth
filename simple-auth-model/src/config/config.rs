@@ -1,10 +1,11 @@
 use std::{fs, io};
-use serde::Deserialize;
-use crate::config::database_config::DatabaseConfig;
+use serde::{Deserialize, Serialize};
+use crate::abs::AsJson;
+use crate::config::database_config::{DatabaseConfig, SqliteConfig};
 use crate::config::server_config::ServerConfig;
 
 /// The global configuration for the application
-#[derive(Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     /// The `actix-web` server configuration
     pub server: ServerConfig,
@@ -31,9 +32,22 @@ impl Default for Config {
 }
 
 impl Config {
-    fn load(path: &str) -> Result<Config, io::Error> {
+    pub fn load(path: &str) -> Result<Config, io::Error> {
         let content = fs::read_to_string(path)?;
-        Ok(serde_json::from_str(content.as_str()).unwrap_or_default())
+        let config = serde_json::from_str(content.as_str()).unwrap();
+        Ok(config)
+    }
+
+    pub fn print_content(&self) -> Result<(), io::Error> {
+        if self.print {
+            println!("{:#?}", &self)
+        }
+        if self.banner.is_some() {
+            let banner = self.banner.as_ref().unwrap();
+            let content = fs::read_to_string(banner)?;
+            println!("{}", content);
+        }
+        Ok(())
     }
 }
 

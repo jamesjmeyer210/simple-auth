@@ -4,7 +4,11 @@
     "port": 9000,
     "workers": null
   },
-  "database": "db.sqlite",
+  "database": {
+    "Sqlite": {
+      "Path": "db.sqlite"
+    }
+  },
   "log_file": "logcfg.yaml",
   "print": true,
   "banner": null

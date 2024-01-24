@@ -1,6 +1,8 @@
 use actix_web::{App, HttpServer, web};
 use actix_web_httpauth::middleware::HttpAuthentication;
 use simple_auth_crud::DbContext;
+use simple_auth_crud::sqlx::Error::Database;
+use simple_auth_model::config::{Config, DatabaseConfig, SqliteConfig};
 use simple_auth_model::log4rs;
 use simple_auth_web::api::{OAuthApiV1, SimpleAuthApiV1, WebApi};
 use simple_auth_web::di::{ServiceFactory, TransientFactory};
@@ -26,10 +28,18 @@ async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError>
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    log4rs::init_file("logcfg.yaml", Default::default()).unwrap();
+    let config = Config::load("appconfig.dev.json")?;
+    config.print_content()?;
 
-    //let db = DbContext::in_memory().await.unwrap();
-    let db = DbContext::new("db.sqlite").await.unwrap();
+    log4rs::init_file(&config.log_file, Default::default()).unwrap();
+
+    let db = match &config.database {
+        DatabaseConfig::Sqlite(sqlite) => match sqlite {
+            SqliteConfig::InMemory => DbContext::in_memory().await.unwrap(),
+            SqliteConfig::Path(path) => DbContext::new(path.as_str()).await.unwrap()
+        }
+    };
+
     db.migrate()
         .await
         .expect("ERROR: Migration failed");
