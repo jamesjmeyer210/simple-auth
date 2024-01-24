@@ -1,8 +1,11 @@
+use std::fmt::{Display, Formatter};
 use actix_web::http::{StatusCode};
+use actix_web::ResponseError;
 use serde::Serialize;
 use simple_auth_crud::sqlx::Error;
 use simple_auth_crud::sqlx::error::ErrorKind;
 use simple_auth_model::uuid::Uuid;
+use simple_auth_model::abs::AsJson;
 use crate::error::ServiceError;
 
 #[derive(Debug, Serialize)]
@@ -99,4 +102,14 @@ impl From<ServiceError> for ProblemDetails<'_> {
             ServiceError::InternalAppError => Self::internal_server_error(),
         }
     }
+}
+
+impl Display for ProblemDetails<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_json().unwrap())
+    }
+}
+
+impl ResponseError for ProblemDetails<'_> {
+
 }

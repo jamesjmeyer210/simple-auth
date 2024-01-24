@@ -1,10 +1,17 @@
 use actix_web::{App, HttpServer, web};
+use actix_web::dev::ServiceRequest;
+use actix_web::error::HttpError;
+use actix_web::http::StatusCode;
+use actix_web::web::Data;
+use actix_web_httpauth::extractors::bearer::BearerAuth;
+use actix_web_httpauth::middleware::HttpAuthentication;
 use simple_auth_crud::DbContext;
 use simple_auth_model::log4rs;
 use simple_auth_web::api::{SimpleAuthApi, WebApi};
 use simple_auth_web::di::{ServiceFactory, TransientFactory};
+use simple_auth_web::dto::ProblemDetails;
 use simple_auth_web::error::ServiceError;
-use simple_auth_web::service::{RealmService, RoleService, UserService};
+use simple_auth_web::service::{AuthService, RealmService, RoleService, UserService};
 
 async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError> {
     let realm_service: RealmService = provider.get_transient();
@@ -53,10 +60,31 @@ async fn main() -> std::io::Result<()> {
     let provider = web::Data::new(factory);
 
     HttpServer::new(move || {
-       App::new()
-           .app_data(provider.clone())
-           .service(web::scope("/api").configure(SimpleAuthApi::register))
+        let auth = HttpAuthentication::bearer(validator);
+        App::new()
+            .app_data(provider.clone())
+            .wrap(auth)
+            .service(web::scope("/api").configure(SimpleAuthApi::register))
     }).bind(("127.0.0.1", 7777))?
         .run()
         .await
+}
+
+async fn validator(req: ServiceRequest, _credentials: BearerAuth)
+    -> Result<ServiceRequest, (actix_web::Error, ServiceRequest)>
+{
+    let factory: Option<&Data<ServiceFactory>> = req.app_data::<Data<ServiceFactory>>();
+    if factory.is_none() {
+        log::info!("Factory is none");
+        return Err((
+            actix_web::Error::from(ProblemDetails::bad_request()),
+            req));
+    }
+    log::info!("Factory exists!");
+
+    let factory = factory.unwrap();
+    let auth_service: AuthService = factory.get_transient();
+    log::info!("Instantiated auth service!");
+
+    Ok(req)
 }
