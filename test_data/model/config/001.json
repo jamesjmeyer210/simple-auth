@@ -1,0 +1,15 @@
+{
+  "server": {
+    "domain": "cfg.test.domain",
+    "port": 9000,
+    "workers": null
+  },
+  "database": {
+    "Sqlite": {
+      "Path": "db.sqlite"
+    }
+  },
+  "log_file": "logcfg.yaml",
+  "print": true,
+  "banner": null
+}

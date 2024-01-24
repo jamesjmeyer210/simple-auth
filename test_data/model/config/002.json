@@ -1,0 +1,13 @@
+{
+  "server": {
+    "domain": "localhost",
+    "port": 999,
+    "workers": 100
+  },
+  "database": {
+    "Sqlite": "InMemory"
+  },
+  "log_file": "logcfg.yaml",
+  "print": true,
+  "banner": ".banner.txt"
+}

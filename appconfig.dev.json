@@ -1,0 +1,15 @@
+{
+  "server": {
+    "domain": "127.0.0.1",
+    "port": 7777,
+    "workers": null
+  },
+  "database": {
+    "Sqlite": {
+      "Path": "db.sqlite"
+    }
+  },
+  "log_file": "logcfg.yaml",
+  "print": true,
+  "banner": ".banner.txt"
+}

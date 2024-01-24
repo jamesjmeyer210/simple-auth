@@ -1,17 +1,18 @@
 mod realm;
 mod role;
-pub mod user;
 mod password;
 mod email;
 mod ip_address;
-pub mod abs;
 mod contact_info;
 mod error;
 mod limit_vec;
 
 // public modules
+pub mod abs;
+pub mod user;
 pub mod jwt;
 pub mod encoding;
+pub mod config;
 
 // re-exports
 pub use chrono;

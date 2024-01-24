@@ -1,21 +1,16 @@
-use std::future::Future;
-use actix_web::{App, HttpResponse, HttpServer, web};
-use actix_web::dev::ServiceRequest;
-use actix_web::error::HttpError;
-use actix_web::http::StatusCode;
-use actix_web::web::Data;
-use actix_web_httpauth::extractors::{AuthenticationError, bearer};
-use actix_web_httpauth::extractors::bearer::{BearerAuth, Error};
+use actix_web::{App, HttpServer, web};
 use actix_web_httpauth::middleware::HttpAuthentication;
 use simple_auth_crud::DbContext;
+use simple_auth_crud::sqlx::Error::Database;
+use simple_auth_model::config::{Config, DatabaseConfig, SqliteConfig};
 use simple_auth_model::log4rs;
 use simple_auth_web::api::{OAuthApiV1, SimpleAuthApiV1, WebApi};
 use simple_auth_web::di::{ServiceFactory, TransientFactory};
-use simple_auth_web::dto::ProblemDetails;
 use simple_auth_web::error::ServiceError;
 use simple_auth_web::middleware::SimpleAuthMiddleware;
-use simple_auth_web::service::{AuthService, RealmService, RoleService, UserService};
+use simple_auth_web::service::{RealmService, RoleService, UserService};
 
+// TODO: move this to a workflow
 async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError> {
     let realm_service: RealmService = provider.get_transient();
 
@@ -33,10 +28,18 @@ async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError>
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    log4rs::init_file("logcfg.yaml", Default::default()).unwrap();
+    let config = Config::load("appconfig.dev.json")?;
+    config.print_content()?;
 
-    //let db = DbContext::in_memory().await.unwrap();
-    let db = DbContext::new("db.sqlite").await.unwrap();
+    log4rs::init_file(&config.log_file, Default::default()).unwrap();
+
+    let db = match &config.database {
+        DatabaseConfig::Sqlite(sqlite) => match sqlite {
+            SqliteConfig::InMemory => DbContext::in_memory().await.unwrap(),
+            SqliteConfig::Path(path) => DbContext::new(path.as_str()).await.unwrap()
+        }
+    };
+
     db.migrate()
         .await
         .expect("ERROR: Migration failed");
@@ -62,7 +65,7 @@ async fn main() -> std::io::Result<()> {
 
     let provider = web::Data::new(factory);
 
-    HttpServer::new(move || {
+    let mut server = HttpServer::new(move || {
         let authentication_middleware = HttpAuthentication::bearer(SimpleAuthMiddleware::authenticate_bearer);
         App::new()
             .app_data(provider.clone())
@@ -75,7 +78,13 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/v1/oauth")
                     .configure(OAuthApiV1::register)
             )
-    }).bind(("127.0.0.1", 7777))?
+    });
+
+    if config.server.workers.is_some() {
+        server = server.workers(config.server.workers.clone().unwrap());
+    }
+
+    server.bind((config.server.domain.as_str(), config.server.port))?
         .run()
         .await
 }
