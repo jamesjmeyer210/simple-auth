@@ -1,0 +1,11 @@
+{
+  "server": {
+    "domain": "localhost",
+    "port": 999,
+    "workers": 100
+  },
+  "database": "in_memory",
+  "log_file": "logcfg.yaml",
+  "print": true,
+  "banner": ".banner.txt"
+}
