@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine as _};
+use uuid::Uuid;
 use crate::abs::AsJson;
 
 pub struct Jwt {
@@ -38,6 +39,7 @@ impl Default for JwtHeader {
 #[derive(Debug, Serialize)]
 pub struct JwtClaims {
     pub name: String,
+    pub user_id: Uuid,
     pub roles: Vec<String>,
     pub realms: Vec<String>,
     pub auth_time: DateTime<Utc>,
@@ -47,6 +49,7 @@ impl Default for JwtClaims {
     fn default() -> Self {
         Self {
             name: String::from("root"),
+            user_id: Uuid::new_v4(),
             roles: vec!["root".to_string()],
             realms: vec!["master".to_string()],
             auth_time: Utc::now(),

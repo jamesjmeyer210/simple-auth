@@ -10,9 +10,9 @@ mod limit_vec;
 // public modules
 pub mod abs;
 pub mod user;
-pub mod jwt;
 pub mod encoding;
 pub mod config;
+pub mod auth;
 
 // re-exports
 pub use chrono;

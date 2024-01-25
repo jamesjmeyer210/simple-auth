@@ -1,4 +1,5 @@
 use serde::Serialize;
+use simple_auth_model::auth::ResourceOwnerTokens;
 
 #[derive(Debug, Serialize)]
 pub(crate) struct ResourceOwnerPasswordResponse {
@@ -6,7 +7,7 @@ pub(crate) struct ResourceOwnerPasswordResponse {
     pub refresh_token: String,
     pub id_token: String,
     pub token_type: String,
-    pub expires_in: u32,
+    pub expires_in: u64,
 }
 
 impl ResourceOwnerPasswordResponse {
@@ -15,13 +16,15 @@ impl ResourceOwnerPasswordResponse {
             access_token: "".to_string(),
             refresh_token: "".to_string(),
             id_token: "".to_string(),
-            token_type: String::from("Bearer"),
+            token_type: String::from("bearer"),
             expires_in: 0,
         }
     }
 
-    pub(crate) fn with_access_token(mut self, access_token: String) -> Self {
-        self.access_token = access_token;
+    pub(crate) fn with_resource_owner_tokens(mut self, tokens: ResourceOwnerTokens) -> Self {
+        self.access_token = tokens.access_token;
+        self.refresh_token = tokens.refresh_token;
+        self.expires_in = tokens.expires_in;
         self
     }
 }

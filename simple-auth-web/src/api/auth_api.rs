@@ -27,16 +27,14 @@ async fn login(dto: web::Json<PasswordLoginDto>, factory: web::Data<ServiceFacto
     let pass = pass.unwrap();
 
     let service: AuthService = factory.get_transient();
-    let access_token = service.get_jwt(dto.user_name, pass)
-        .await
-        .map(|x|x.to_base64_string());
+    let tokens = service.get_resource_owner_tokens(dto.user_name, pass).await;
 
-    if access_token.is_err() {
-        return HttpContext::error_response(access_token.unwrap_err());
+    if tokens.is_err() {
+        return HttpContext::error_response(tokens.unwrap_err());
     }
 
     HttpResponse::Ok().json(
         ResourceOwnerPasswordResponse::bearer()
-            .with_access_token(access_token.unwrap())
+            .with_resource_owner_tokens(tokens.unwrap())
     )
 }
