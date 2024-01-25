@@ -17,4 +17,4 @@ root:
 
 loggers:
   sqlx::query:
-    level: info
+    level: debug
