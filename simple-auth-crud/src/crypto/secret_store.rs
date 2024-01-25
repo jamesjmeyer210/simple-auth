@@ -4,8 +4,8 @@ use std::fs;
 use std::sync::Arc;
 use aes_gcm::{aead::{KeyInit}, AeadCore, AeadInPlace, Aes256Gcm};
 use simple_auth_model::abs::{AsBytes, AsJson};
+use simple_auth_model::auth::{RefreshToken, RefreshTokenHash};
 use simple_auth_model::encoding::JwtByteParts;
-use simple_auth_model::jwt::{JwtClaims, JwtHeader};
 use crate::abs::table::Table;
 use crate::crypto::encrypted::{encrypt, Encrypted};
 use crate::crypto::EncryptionError;
@@ -79,6 +79,20 @@ impl SecretStore {
         Sha256Hash::from(bytes.as_slice())
     }
 
+    fn sha256_refresh_token(&self, token: &RefreshToken) -> Sha256Hash {
+        let json = token.as_json().unwrap();
+        let secret = self.inner.sig_key.as_bytes();
+        let mut bytes = Vec::with_capacity(json.len() + secret.len());
+        for i in json.as_bytes() {
+            bytes.push(*i);
+        }
+        for i in secret {
+            bytes.push(*i);
+        }
+
+        Sha256Hash::from(bytes.as_slice())
+    }
+
     /// Encrypts any `data` with the internal encryption key
     pub fn encrypt<T>(&self, data: &[u8]) -> Result<Encrypted<T>,EncryptionError>
         where T: KeyInit + AeadCore + AeadInPlace
@@ -89,6 +103,12 @@ impl SecretStore {
     /// Returns a JWT signature
     pub fn sign_jwt(&self, header: &str, claims: &str) -> Vec<u8> {
         self.sha256_sign_jwt(header.as_bytes(), claims.as_bytes()).into()
+    }
+
+    /// Appends the `signing key` to the [`RefreshToken`] and returns the hashed result
+    pub fn hash_refresh_token(&self, token: &RefreshToken) -> RefreshTokenHash {
+        let bytes: Vec<u8> = self.sha256_refresh_token(token).into();
+        bytes.into()
     }
 
     /// Validates the signature within `parts` against the internal signing key
@@ -153,7 +173,7 @@ impl <'r>SecretStoreBuilder<'r> {
 mod test {
     use simple_auth_model::abs::AsJson;
     use simple_auth_model::encoding::JwtStr;
-    use simple_auth_model::jwt::{Jwt, JwtClaims, JwtHeader};
+    use simple_auth_model::auth::{Jwt, JwtClaims, JwtHeader};
     use crate::DbContext;
     use super::{SecretStore, SecretStoreBuilder};
 
@@ -184,4 +204,6 @@ mod test {
         let parts = JwtStr::try_from(encoded_jwt.as_str()).unwrap().into_parts().into();
         assert!(store.validate_jwt(&parts))
     }
+
+
 }
