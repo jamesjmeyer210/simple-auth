@@ -7,7 +7,7 @@ pub struct JwtStr<'s> {
 
 impl JwtStr<'_> {
     fn is_jwt(s: &str) -> bool {
-        regex_is_match!("^(([A-Za-z0-9_-]{2}){1,1028}[.]){2}([A-Za-z0-9_-]{1,256})$", s)
+        regex_is_match!("^([A-Za-z0-9_-]{1,2048}[.]){2}([A-Za-z0-9_-]{1,256})$", s)
     }
 }
 
@@ -72,7 +72,10 @@ mod test {
             .fE5Cmm8J3AlSaweFuBtd90I8gpfbdPCmbgRq7TuMYKg",
             "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
             .eyJuYW1lIjoicm9vdCIsInJvbGVzIjpbInJvb3QiXSwicmVhbG1zIjpbIm1hc3RlciJdLCJhdXRoX3RpbWUiOiIyMDI0LTAxLTI0VDA0OjIwOjM4LjY0Njk5NjEzNVoifQ\
-            .q3y4J7CDbtl390n7NTIejYpZPC3R8zs8m-B4GERJOyQ"
+            .q3y4J7CDbtl390n7NTIejYpZPC3R8zs8m-B4GERJOyQ",
+            "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
+            .eyJuYW1lIjoicm9vdCIsInVzZXJfaWQiOiIyYWNmMTRlYi04NmViLTRjYWMtYTJlZC1hMTAzYTJjNzM1YTQiLCJyb2xlcyI6WyJyb290Il0sInJlYWxtcyI6WyJtYXN0ZXIiXSwiYXV0aF90aW1lIjoiMjAyNC0wMS0yNVQxODozOTowOS40NjcxNTExNzFaIn0\
+            .d7coCxgIjpDSDft9D63aNRX9plDw3JBxIrUGfkK7sVA"
         ];
 
         for jwt in jwts.iter() {

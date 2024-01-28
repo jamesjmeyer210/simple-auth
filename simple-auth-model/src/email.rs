@@ -22,7 +22,7 @@ impl TryFrom<&str> for Email {
 
 impl IsValid<&str> for Email {
     fn is_valid(value: &str) -> bool {
-        regex_is_match!(r"^([a-zA-Z0-9!#$%&'*+\-/=?^_`{|}~]{1,256}@)([a-z0-9]{1,256})([.][a-z0-9]{1,64}){1,8}$", value)
+        regex_is_match!(r"^([a-zA-Z0-9!#$%&'*+\-/=?^_`{|}~\.]{1,256}@)([a-z0-9]{1,256})([.][a-z0-9]{1,64}){1,8}$", value)
     }
 }
 
@@ -49,7 +49,8 @@ mod test {
             "roo123@localhost.com",
             "root@admin.localhost.org",
             "root+admin@email.localhost.net",
-            "r00!/admin@localhost.127.0.0.1"
+            "r00!/admin@localhost.127.0.0.1",
+            "Aryanna.Hodkiewicz@yahoo.com"
         ];
 
         for email in emails.iter() {

@@ -1,0 +1,657 @@
+{
+	"info": {
+		"_postman_id": "859b785a-4850-4618-8d21-1802225b03bf",
+		"name": "simple-auth-web",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22300068"
+	},
+	"item": [
+		{
+			"name": "realm",
+			"item": [
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const list = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(list).to.be.an('array');",
+									"    pm.expect(list[0]['name']).to.be.a('string');",
+									"});",
+									"",
+									"const realm = list[0]['name'];",
+									"pm.collectionVariables.set(\"realm\", realm);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/realm",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"realm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_by_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['name']).to.eq(pm.collectionVariables.get(\"realm\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/realm/{{realm}}",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"realm",
+								"{{realm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['name']).to.be.a('string');",
+									"});",
+									"",
+									"const realm = obj['name'];",
+									"pm.collectionVariables.set('realm', realm);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"{{$randomNoun}}\"",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/realm",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"realm"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "role",
+			"item": [
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const list = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(list).to.be.an('array');",
+									"    pm.expect(list[0]['name']).to.be.a('string');",
+									"});",
+									"",
+									"const role = list[0]['name'];",
+									"pm.collectionVariables.set(\"role\", role);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/role",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_by_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['name']).to.eq(pm.collectionVariables.get(\"role\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/role/{{role}}",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"role",
+								"{{role}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 202\", () => {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['name']).to.be.a('string');",
+									"});",
+									"",
+									"const role = obj['name'];",
+									"pm.collectionVariables.set('role', role);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"{{$randomNoun}}\",\n    \"max\":{{$randomInt}},\n    \"realms\":[\n        \"{{realm}}\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/role",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"role"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const list = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(list).to.be.an('array');",
+									"    pm.expect(list[0]['id']).to.be.a('string');",
+									"    pm.expect(list[0]['name']).to.be.a('string');",
+									"});",
+									"",
+									"const userId = list[0]['id'];",
+									"const userName = list[0]['name'];",
+									"pm.collectionVariables.set(\"userId\", userId);",
+									"pm.collectionVariables.set(\"userName\", userName);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/user/0",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"user",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_by_query",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['id']).to.be.a('string');",
+									"    pm.expect(obj['name']).to.be.a('string');",
+									"});",
+									"",
+									"const userId = obj['id'];",
+									"const userName = obj['name'];",
+									"pm.collectionVariables.set(\"userId\", userId);",
+									"pm.collectionVariables.set(\"userName\", userName);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/user?name={{userName}}",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"user"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "{{userName}}"
+								},
+								{
+									"key": "contact",
+									"value": "root@localhost.com",
+									"disabled": true
+								},
+								{
+									"key": "id",
+									"value": "{{userId}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(202);",
+									"});",
+									"",
+									"pm.test(\"Content-Type is present\", () => {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"});",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['id']).to.be.a('string');",
+									"    pm.expect(obj['name']).to.be.a('string');",
+									"});",
+									"",
+									"const userId = obj['id'];",
+									"const userName = obj['name'];",
+									"pm.collectionVariables.set(\"userId\", userId);",
+									"pm.collectionVariables.set(\"userName\", userName);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"{{$randomUserName}}\",\n    \"password1\": \"test-password123\",\n    \"password2\": \"test-password123\",\n    \"contact\": {\n        \"label\":\"email\",\n        \"value\":\"{{$randomEmail}}\"\n    },\n    \"role\": \"{{role}}\",\n    \"realm\": \"{{realm}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{Domain}}/v1/api/user",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "oauth",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test(\"Content-Type is present\", function () {",
+									"    pm.response.to.have.header(\"Content-Type\");",
+									"});",
+									"pm.test(\"Content-Length is present\", () => {",
+									"    pm.response.to.have.header(\"content-length\");",
+									"})",
+									"",
+									"const obj = pm.response.json();",
+									"",
+									"pm.test(\"Response body is valid\", () => {",
+									"    pm.expect(obj['access_token']).to.be.a('string');",
+									"    pm.expect(obj['refresh_token']).to.be.a('string');",
+									"    pm.expect(obj['token_type']).to.eq(\"bearer\");",
+									"    pm.expect(obj['expires_in']).to.be.a('number');",
+									"})",
+									"",
+									"pm.collectionVariables.set(\"access_token\", obj['access_token']);",
+									"pm.collectionVariables.set(\"refresh_token\", obj['refresh_token']);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_name\":\"root\",\n    \"password\":\"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{Domain}}/v1/oauth/token",
+							"protocol": "http",
+							"host": [
+								"{{Domain}}"
+							],
+							"path": [
+								"v1",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "refresh_token",
+			"value": ""
+		},
+		{
+			"key": "realm",
+			"value": ""
+		},
+		{
+			"key": "role",
+			"value": ""
+		},
+		{
+			"key": "userName",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}
