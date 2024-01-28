@@ -570,14 +570,7 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ.eyJuYW1lIjoicm9vdCIsInJvbGVzIjpbInJvb3QiXSwicmVhbG1zIjpbIm1hc3RlciJdLCJhdXRoX3RpbWUiOiIyMDI0LTAxLTI0VDA0OjMxOjI3LjE4MDYyODgzNVoifQ.zlm0QmRg-47zpfCge9CH35tm33mB9cn6LPos2IAMMu4",
-								"type": "text",
-								"disabled": true
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"user_name\":\"root\",\n    \"password\":\"password123\"\n}",
