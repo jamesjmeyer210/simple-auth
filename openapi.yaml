@@ -1,0 +1,320 @@
+openapi: 3.0.3
+info:
+  title: simple-auth-web
+  version: 0.1.0
+  contact: {}
+servers:
+- url: http://127.0.0.1:7777
+paths:
+  /v1/api/realm:
+    get:
+      tags:
+      - realm
+      summary: Gets all realms
+      description: Gets all of the realms which are not deleted
+      operationId: getAllRealms
+      responses:
+        '200':
+          description: 'A collection of all realms'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RealmDto'
+    post:
+      tags:
+      - realm
+      summary: Add a realm
+      description: Adds a new realm if one with that name does not exist
+      operationId: add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        200:
+          description: New response
+          content:
+            application/json:
+              schema:
+                :
+        '200':
+          description: 'Returns the newly added realm'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmDto'
+  /v1/api/realm/{realm}:
+    get:
+      tags:
+      - realm
+      summary: Get one realm
+      description: Gets a realm by its name
+      operationId: getById
+      responses:
+        '200':
+          description: 'The specific realm'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealmDto'
+    parameters:
+    - name: realm
+      in: path
+      required: true
+      schema:
+        type: string
+  /v1/api/role:
+    get:
+      tags:
+      - role
+      summary: Get all roles
+      description: Returns all of the roles
+      operationId: getAllRoles
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: 'array'
+                items:
+                  $ref: '#/components/schemas/RoleDto'
+    post:
+      tags:
+      - role
+      summary: Add a role
+      description: Adds a role if it does not exist
+      operationId: add_role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRoleDto'
+      responses:
+        '200':
+          description: 'The newly added role'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+  /v1/api/role/{role}:
+    get:
+      tags:
+      - role
+      summary: Get role by id
+      description: Gets a single role by its name (id)
+      operationId: get_role_by_id
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+    parameters:
+    - name: role
+      in: path
+      required: true
+      schema:
+        type: string
+  /v1/api/user/{page}:
+    get:
+      tags:
+      - user
+      summary: 'Gets a paginated list of users'
+      description: The page limit is defined internally. It's default is 1000
+      operationId: get_all_users
+      responses:
+        '200':
+          description: 'A collection of users'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+  /v1/api/user:
+    get:
+      tags:
+      - user
+      summary: Get a single user
+      description: Gets a user based on a variety of query parameters
+      operationId: getByQuery
+      parameters:
+      - name: name
+        in: query
+        schema:
+          type: string
+          example: 'root'
+      - name: contact
+        in: query
+        schema:
+          type: string
+          example: 'root@localhost.com'
+      - name: id
+        in: query
+        schema:
+          type: string
+          example: 'a9fb4889-9947-4ab6-a53a-12c1a818794c'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    post:
+      tags:
+      - user
+      summary: Adds a new user
+      description: add
+      operationId: add2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddUserDto"
+      responses:
+        '202':
+          description: 'The user has been saved to the database'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '400':
+          description: 'One or more of the fields in the POST body is invalid'
+        '401':
+          description: 'Insufficient authorization'
+        '409':
+          description: 'A user with that name or contact info has already been added'
+  /v1/oauth/token:
+    post:
+      tags:
+      - oauth
+      summary: login
+      description: The username/password login which returns an object of tokens.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResourceOwnerPasswordRequest"
+            examples:
+              login:
+                value:
+                  password: password123
+                  user_name: root
+      responses:
+        '200':
+          description: 'An object of authentication tokens is returned to the client'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceOwnerPasswordResponse'
+        '401':
+          description: 'The provided credentials were incorrect'
+components:
+  schemas:
+    ResourceOwnerPasswordRequest:
+      type: object
+      properties:
+        user_name:
+          type: string
+        password:
+          type: string
+    ResourceOwnerPasswordResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: A base64 encoded JWT
+        refresh_token:
+          type: string
+          description: A base64 encoded refresh token
+        token_type:
+          type: string
+          example: 'bearer'
+          description: The type of token returned
+        expires_in:
+          type: integer
+          description: The time the JWT will last before it expires in seconds
+    AddUserContactDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: "email"
+        value:
+          type: string
+          example: "root@localhost.com"
+    AddUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        password1:
+          type: string
+        password2:
+          type: string
+        realm:
+          type: string
+        role:
+          type: string
+        contact:
+          $ref: "#/components/schemas/AddUserContactDto"
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        realm:
+          type: string
+        created_on:
+          type: string
+    AddRoleDto:
+      type: object
+      properties:
+        name:
+          type: string
+        max:
+          type: integer
+          description: 'The maximum number of users who may have this role'
+    RoleDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'root'
+        max:
+          type: integer
+          description: 'The maximum number of users who may have this role'
+        created_on:
+          type: string
+          example: '2024-01-27T21:29:45.325285645Z'
+    RealmDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'master'
+        created_on:
+          type: string
+          example: '2024-01-27T21:29:45.325285645Z'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+security:
+- bearerAuth: []
+tags:
+- name: realm
+- name: role
+- name: user
+- name: oauth
