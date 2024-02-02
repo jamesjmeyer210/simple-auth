@@ -1,4 +1,5 @@
 use actix_web::{App, HttpServer, web};
+use actix_web::middleware::Logger;
 use actix_web_httpauth::middleware::HttpAuthentication;
 use simple_auth_crud::DbContext;
 use simple_auth_crud::sqlx::Error::Database;
@@ -69,6 +70,7 @@ async fn main() -> std::io::Result<()> {
         let authentication_middleware = HttpAuthentication::bearer(SimpleAuthMiddleware::authenticate_bearer);
         App::new()
             .app_data(provider.clone())
+            .wrap(Logger::default())
             .service(
                 web::scope("/v1/api")
                     .wrap(authentication_middleware)
