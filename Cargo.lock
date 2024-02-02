@@ -1817,6 +1817,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-auth-crypto"
+version = "0.1.0"
+
+[[package]]
 name = "simple-auth-model"
 version = "0.1.0"
 dependencies = [

@@ -4,4 +4,4 @@ members = [
   "simple-auth-web",
   "simple-auth-crud",
   "simple-auth-model"
-]
+, "simple-auth-crypto"]
