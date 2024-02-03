@@ -20,6 +20,7 @@ enc_key
 *.pem
 *.cer
 *.crt
+scripts/target
 
 # startup banner
 .banner*
