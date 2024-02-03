@@ -1,6 +1,8 @@
 use openssl::encrypt::Encrypter;
+use openssl::hash::MessageDigest;
 use openssl::pkey::{PKey, Private, Public};
 use openssl::rsa::{Padding, Rsa};
+use openssl::x509::{X509, X509Builder, X509NameBuilder};
 
 pub(crate) struct RsaKeyPair
 {
@@ -41,6 +43,21 @@ impl RsaKeyPair {
         encrypted
     }
 
+    pub fn to_x509(&self) -> X509 {
+        let mut name_builder = X509NameBuilder::new().unwrap();
+        name_builder.append_entry_by_text("C", "US").unwrap();
+        name_builder.append_entry_by_text("O", "Simple Auth Org").unwrap();
+        name_builder.append_entry_by_text("CN", "localhost").unwrap();
+        let x509_name = name_builder.build();
+
+        let mut builder = X509Builder::new().unwrap();
+        builder.set_subject_name(&x509_name).unwrap();
+
+        builder.set_pubkey(&self.public()).unwrap();
+        builder.sign(&self.private(), MessageDigest::sha256()).unwrap();
+        builder.build()
+    }
+
     fn private(&self) -> PKey<Private> {
         PKey::from_rsa(self.private.clone()).unwrap()
     }
@@ -48,6 +65,8 @@ impl RsaKeyPair {
 
 #[cfg(test)]
 mod test {
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
     use super::RsaKeyPair;
 
     #[test]
@@ -61,5 +80,22 @@ mod test {
 
         let encrypted = pair.encrypt(b"Secret message.");
         assert!(encrypted.len() > 1);
+    }
+
+    #[test]
+    fn generate_cert_returns_x509() {
+        let pair = RsaKeyPair::generate();
+        let x509 = pair.to_x509();
+
+        assert!(x509.public_key().is_ok());
+
+        let t = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        let t = t.as_millis();
+
+        let txt = x509.to_text().unwrap();
+        fs::write(format!("{}.txt", t), txt).unwrap();
+
+        let pem = x509.to_pem().unwrap();
+        fs::write(format!("{}.pem", t), pem).unwrap();
     }
 }
