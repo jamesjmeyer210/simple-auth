@@ -2,7 +2,7 @@ use openssl::encrypt::Encrypter;
 use openssl::pkey::{PKey, Private, Public};
 use openssl::rsa::{Padding, Rsa};
 
-struct RsaKeyPair
+pub(crate) struct RsaKeyPair
 {
     public: Rsa<Public>,
     private: Rsa<Private>
