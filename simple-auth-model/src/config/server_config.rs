@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct ServerConfig {
     pub domain: String,
     pub port: u16,
