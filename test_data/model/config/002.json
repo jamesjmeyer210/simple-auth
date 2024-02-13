@@ -7,6 +7,9 @@
   "database": {
     "Sqlite": "InMemory"
   },
+  "security": {
+    "jwt_signature_scheme": "PublicKey"
+  },
   "log_file": "logcfg.yaml",
   "print": true,
   "banner": ".banner.txt"
