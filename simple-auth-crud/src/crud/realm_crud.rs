@@ -53,9 +53,15 @@ impl <'r>RealmCrud<'r> {
     }
 
     pub async fn update(&self, update: UpdateRealm) -> Result<String, sqlx::Error> {
-        let c =self._realms.update(&update).await?;
+        let c = self._realms.update(&update).await?;
         log::debug!("{} realms updated", c);
         Ok(update.rename)
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
+        let c = self._realms.soft_delete_by_id(id).await?;
+        log::debug!("Soft-deleted {}", id);
+        Ok(())
     }
 }
 

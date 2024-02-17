@@ -72,6 +72,13 @@ impl <'r>RealmService<'r> {
             .await
             .map_err(|e|ServiceError::from(e))
     }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), ServiceError> {
+        let crud = self.db_context.get_crud::<RealmCrud>();
+        crud.soft_delete_by_id(id)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
 }
 
 #[cfg(test)]

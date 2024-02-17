@@ -57,6 +57,15 @@ impl HttpContext {
         }
     }
 
+    fn no_content<T>(result: Result<T,ServiceError>) -> HttpResponse
+        where T: Serialize
+    {
+        match result {
+            Ok(_) => HttpResponse::NoContent().finish(),
+            Err(e) => Self::error_response(e)
+        }
+    }
+
     fn error_response(error: ServiceError) -> HttpResponse {
         log::error!("{:?}", error);
         let e: ProblemDetails = error.into();
