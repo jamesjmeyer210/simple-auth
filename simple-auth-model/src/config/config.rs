@@ -1,16 +1,19 @@
 use std::{fs, io};
 use serde::{Deserialize, Serialize};
 use crate::abs::AsJson;
-use crate::config::database_config::{DatabaseConfig, SqliteConfig};
+use crate::config::database_config::{DatabaseConfig};
+use crate::config::security_config::SecurityConfig;
 use crate::config::server_config::ServerConfig;
 
 /// The global configuration for the application
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Config {
     /// The `actix-web` server configuration
     pub server: ServerConfig,
     /// The `database` configuration
     pub database: DatabaseConfig,
+    /// The `security` configuration
+    pub security: SecurityConfig,
     /// The path of the logging configuration
     pub log_file: String,
     /// Indicates that the [`Config`] should be printed when true
@@ -24,6 +27,7 @@ impl Default for Config {
         Self {
             server: ServerConfig::default(),
             database: DatabaseConfig::default(),
+            security: Default::default(),
             log_file: String::from("logcfg"),
             print: false,
             banner: None,

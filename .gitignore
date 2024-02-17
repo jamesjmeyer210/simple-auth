@@ -15,6 +15,12 @@ log
 
 # crypto
 enc_key
+*.key
+*.pub
+*.pem
+*.cer
+*.crt
+scripts/target
 
 # startup banner
 .banner*

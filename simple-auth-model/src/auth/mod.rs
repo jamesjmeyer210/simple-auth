@@ -1,6 +1,7 @@
 mod jwt;
 mod refresh_token;
 mod resource_owner_tokens;
+mod jwks;
 
 pub type Jwt = jwt::Jwt;
 pub type JwtHeader = jwt::JwtHeader;
