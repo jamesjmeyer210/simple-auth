@@ -9,6 +9,9 @@
       "Path": "db.sqlite"
     }
   },
+  "security": {
+    "jwt_signature_scheme": "Secret"
+  },
   "log_file": "logcfg.yaml",
   "print": true,
   "banner": ".banner.txt"

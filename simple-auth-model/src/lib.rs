@@ -1,4 +1,3 @@
-mod realm;
 mod role;
 mod password;
 mod email;
@@ -13,6 +12,7 @@ pub mod user;
 pub mod encoding;
 pub mod config;
 pub mod auth;
+pub mod realm;
 
 // re-exports
 pub use chrono;

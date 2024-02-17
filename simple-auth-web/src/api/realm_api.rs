@@ -1,6 +1,7 @@
-use actix_web::{get, HttpResponse, post, Responder, web};
+use actix_web::{get, HttpResponse, patch, post, Responder, web};
 use actix_web::http::StatusCode;
 use actix_web::web::ServiceConfig;
+use simple_auth_model::realm::UpdateRealm;
 use crate::api::{HttpContext, WebApi};
 use crate::di::{ServiceFactory, TransientFactory};
 use crate::dto::ProblemDetails;
@@ -13,6 +14,7 @@ impl WebApi for RealmApi {
         cfg.service(get_all);
         cfg.service(get_by_id);
         cfg.service(add);
+        cfg.service(update);
     }
 }
 
@@ -49,4 +51,11 @@ async fn add(realm: web::Json<String>, factory: web::Data<ServiceFactory<'_>>) -
             }
         }
     }
+}
+
+#[patch("/realm")]
+async fn update(update: web::Json<UpdateRealm>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
+    let service: RealmService = factory.get_transient();
+    let result = service.update(update.into_inner()).await;
+    HttpContext::accepted(result)
 }
