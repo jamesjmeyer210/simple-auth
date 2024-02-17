@@ -280,6 +280,10 @@ components:
         max:
           type: integer
           description: 'The maximum number of users who may have this role'
+        realms:
+          type: array
+          items:
+            type: string
     RoleDto:
       type: object
       properties:
