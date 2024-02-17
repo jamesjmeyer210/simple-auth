@@ -6,7 +6,7 @@ impl<'r> Table<'r, RoleEntity> {
         sqlx::query(
             r#"
             INSERT INTO `roles` (`name`, `max`, `realm_id`, `created_on`, `deleted_on`)
-            VALUES(?, ?, ?, ?)
+            VALUES(?, ?, ?, ?, ?)
             "#)
             .bind(&model.name)
             .bind(&model.max)
@@ -32,7 +32,7 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn all(&self) -> Result<Vec<RoleEntity>, sqlx::Error> {
         sqlx::query_as(
             r#"
-            SELECT `name`, `max`, `created_on`, `deleted_on`
+            SELECT `name`, `max`, `realm_id`, `created_on`, `deleted_on`
             FROM `roles`
             WHERE `deleted_on` IS NULL
             "#,)
@@ -43,7 +43,7 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn get_by_id(&self, id: &str) -> Result<RoleEntity, sqlx::Error> {
         sqlx::query_as(
             r#"
-            SELECT `name`, `max`, `created_on`, `deleted_on`
+            SELECT `name`, `max`, `created_on`, `realm_id`, `deleted_on`
             FROM `roles` AS `a`
             WHERE `deleted_on` IS NULL AND `a`.`name` = ?
             "#,)

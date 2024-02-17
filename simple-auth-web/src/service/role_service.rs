@@ -21,7 +21,7 @@ impl <'r>From<&ServiceFactory<'r>> for RoleService<'r> {
 impl <'r>Service<Role> for RoleService<'r> {
     async fn get_all(&self) -> Result<Vec<Role>, ServiceError> {
         let crud = self.db_context.get_crud::<RoleCrud>();
-
+        log::debug!("Retrieving all roles");
         crud.get_all()
             .await
             .map_err(|e|ServiceError::from(e))
@@ -31,15 +31,16 @@ impl <'r>Service<Role> for RoleService<'r> {
 impl <'r>RoleService<'r> {
     pub async fn get_by_id(&self, id: &str) -> Result<Role,ServiceError> {
         let crud = self.db_context.get_crud::<RoleCrud>();
-
+        log::debug!("Retrieving role \"{}\"", id);
         crud.get_by_id(id)
             .await
             .map_err(|e|ServiceError::from(e))
     }
 
     pub async fn add_default(&self, realm: String) -> Result<Role,ServiceError> {
-        let role = Role::default().with_realm(realm);
+        log::debug!("Adding default role to realm \"{}\"", &realm);
 
+        let role = Role::default().with_realm(realm);
         let crud = self.db_context.get_crud::<RoleCrud>();
 
         if crud.contains(&role.name).await? {
@@ -57,6 +58,8 @@ impl <'r>RoleService<'r> {
 
     pub async fn add(&self, name: String, max: Option<u32>, realm: String) -> Result<Role,ServiceError> {
         let realm_crud = self.db_context.get_crud::<RealmCrud>();
+        log::debug!("Adding role \"{}\"", &name);
+
         let realm = realm_crud.get_by_id(&realm)
             .await
             .map_err(|e|ServiceError::from(e))?;
