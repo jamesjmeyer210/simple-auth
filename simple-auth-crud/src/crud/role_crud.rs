@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use simple_auth_model::Role;
+use simple_auth_model::role::RoleUpdate;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::db::DbContext;
@@ -45,5 +46,11 @@ impl <'r>RoleCrud<'r> {
         self._roles.get_by_id(id)
             .await
             .map(|x|x.into())
+    }
+
+    pub async fn update(&self, update: RoleUpdate) -> Result<String, sqlx::Error> {
+        let c = self._roles.update(&update).await?;
+        log::debug!("Updated {} roles", c);
+        Ok(update.rename)
     }
 }

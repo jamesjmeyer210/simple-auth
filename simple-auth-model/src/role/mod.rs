@@ -1,6 +1,10 @@
+mod role_update;
+
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::realm::Realm;
+
+pub type RoleUpdate = role_update::RoleUpdate;
 
 #[derive(Debug, Serialize)]
 pub struct Role {

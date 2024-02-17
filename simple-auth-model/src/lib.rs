@@ -1,4 +1,3 @@
-mod role;
 mod password;
 mod email;
 mod ip_address;
@@ -13,6 +12,7 @@ pub mod encoding;
 pub mod config;
 pub mod auth;
 pub mod realm;
+pub mod role;
 
 // re-exports
 pub use chrono;

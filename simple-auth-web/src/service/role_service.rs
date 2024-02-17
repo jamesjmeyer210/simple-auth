@@ -2,6 +2,7 @@ use std::sync::Arc;
 use simple_auth_crud::crud::{RealmCrud, RoleCrud};
 use simple_auth_crud::DbContext;
 use simple_auth_model::{Realm, Role};
+use simple_auth_model::role::RoleUpdate;
 use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 use crate::service::Service;
@@ -68,6 +69,13 @@ impl <'r>RoleService<'r> {
 
         let role_crud = self.db_context.get_crud::<RoleCrud>();
         role_crud.add(role)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
+
+    pub async fn update(&self, update: RoleUpdate) -> Result<String,ServiceError> {
+        let role_curd = self.db_context.get_crud::<RoleCrud>();
+        role_curd.update(update)
             .await
             .map_err(|e|ServiceError::from(e))
     }

@@ -1,3 +1,4 @@
+use simple_auth_model::role::RoleUpdate;
 use crate::abs::table::Table;
 use crate::entity::{Count, RoleEntity};
 
@@ -50,6 +51,23 @@ impl<'r> Table<'r, RoleEntity> {
             .bind(id)
             .fetch_one(&*self.pool)
             .await
+    }
+
+    pub async fn update(&self, update: &RoleUpdate) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `roles`
+            SET
+                `name` = ?,
+                `max` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&update.rename)
+            .bind(&update.max)
+            .bind(&update.name)
+            .execute(&*self.pool)
+            .await
+            .map(|e|e.rows_affected())
     }
 }
 
