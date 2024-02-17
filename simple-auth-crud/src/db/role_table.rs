@@ -5,11 +5,12 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn add(&self, model: &RoleEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"
-            INSERT INTO `roles` (`name`, `max`, `created_on`, `deleted_on`)
+            INSERT INTO `roles` (`name`, `max`, `realm_id`, `created_on`, `deleted_on`)
             VALUES(?, ?, ?, ?)
             "#)
             .bind(&model.name)
             .bind(&model.max)
+            .bind(&model.realm_id)
             .bind(&model.created_on)
             .bind(&model.deleted_on)
             .execute(&*self.pool)

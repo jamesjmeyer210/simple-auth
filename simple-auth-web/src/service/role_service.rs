@@ -37,7 +37,7 @@ impl <'r>RoleService<'r> {
             .map_err(|e|ServiceError::from(e))
     }
 
-    pub async fn add_default(&self, realm: Realm) -> Result<Role,ServiceError> {
+    pub async fn add_default(&self, realm: String) -> Result<Role,ServiceError> {
         let role = Role::default().with_realm(realm);
 
         let crud = self.db_context.get_crud::<RoleCrud>();
@@ -55,17 +55,13 @@ impl <'r>RoleService<'r> {
         Ok(role)
     }
 
-    pub async fn add(&self, name: String, max: Option<u32>, realms: Vec<String>) -> Result<Role,ServiceError> {
+    pub async fn add(&self, name: String, max: Option<u32>, realm: String) -> Result<Role,ServiceError> {
         let realm_crud = self.db_context.get_crud::<RealmCrud>();
-        let realms_found = realm_crud.get_by_names(&realms)
+        let realm = realm_crud.get_by_id(&realm)
             .await
             .map_err(|e|ServiceError::from(e))?;
 
-        if realms_found.len() != realms.len() {
-            return Err(ServiceError::InvalidArgument);
-        }
-
-        let role = Role::new(name, max, realms_found);
+        let role = Role::new(name, max, &realm);
 
         let role_crud = self.db_context.get_crud::<RoleCrud>();
         role_crud.add(role)

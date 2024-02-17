@@ -7,7 +7,7 @@ pub struct Role {
     pub name: String,
     pub max: Option<u32>,
     pub created_on: DateTime<Utc>,
-    pub realms: Vec<Realm>,
+    pub realm: String,
 }
 
 impl Default for Role {
@@ -16,24 +16,24 @@ impl Default for Role {
             name: String::from("root"),
             max: Some(1),
             created_on: Utc::now(),
-            realms: Vec::with_capacity(0)
+            realm: Realm::default().name,
         }
     }
 }
 
 impl Role {
-    pub fn new(name: String, max: Option<u32>, realms: Vec<Realm>) -> Self
+    pub fn new(name: String, max: Option<u32>, realm: &Realm) -> Self
     {
         Self {
             name,
             max,
-            realms,
+            realm: realm.name.clone(),
             created_on: Utc::now(),
         }
     }
 
-    pub fn with_realm(mut self, realm: Realm) -> Self {
-        self.realms.push(realm);
+    pub fn with_realm(mut self, realm: String) -> Self {
+        self.realm = realm;
         self
     }
 }

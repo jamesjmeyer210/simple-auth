@@ -33,13 +33,8 @@ async fn get_by_id(id: web::Path<String>, factory: web::Data<ServiceFactory<'_>>
 #[post("/role")]
 pub async fn add(role: web::Json<AddRoleDto>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
     let role = role.into_inner();
-    if role.realms.len() == 0 {
-        let e = ProblemDetails::new(StatusCode::BAD_REQUEST, "Missing realms")
-            .with_detail("A role requires at least one realm in order to be added");
-        return HttpResponse::BadRequest().json(e);
-    }
 
     let service: RoleService = factory.get_transient();
-    let result = service.add(role.name, role.max, role.realms).await;
+    let result = service.add(role.name, role.max, role.realm).await;
     HttpContext::accepted(result)
 }

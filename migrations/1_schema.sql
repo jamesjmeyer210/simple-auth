@@ -24,8 +24,13 @@ drop table if exists `roles`;
 create table if not exists `roles` (
     `name` text primary key not null unique,
     `max` integer,
+    `realm_id` text not null,
     `created_on` text not null,
-    `deleted_on` text
+    `deleted_on` text,
+    constraint fk_realm
+        foreign key (`realm_id`)
+            references realms(`name`)
+            on delete cascade
 );
 
 drop table if exists `role_events`;
@@ -39,20 +44,6 @@ create table if not exists `role_events` (
     `deleted_on` text,
     constraint fk_realms
         foreign key (`role_id`)
-            references roles(`name`)
-            on delete cascade
-);
-
-drop table if exists `roles_to_realms`;
-create table if not exists `roles_to_realms` (
-    `realm_name` text not null,
-    `role_name` text not null,
-    constraint fk_realms
-        foreign key (`realm_name`)
-            references realms(`name`)
-            on delete cascade,
-    constraint fk_roles
-        foreign key (`role_name`)
             references roles(`name`)
             on delete cascade
 );

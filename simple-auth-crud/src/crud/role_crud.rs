@@ -30,16 +30,6 @@ impl <'r>RoleCrud<'r> {
         let entity = RoleEntity::from(&model);
         let c = self._roles.add(&entity).await?;
         log::debug!("Added {} role", c);
-
-        if model.realms.len() == 0 {
-            log::warn!("No realms associated with {}", &model.name);
-            return Ok(model);
-        }
-
-        let realms: Vec<&String> = model.realms.iter().map(|x|&x.name).collect();
-        let c = self._roles_to_realms.add_realms_to_role(&model.name, &realms).await?;
-        log::debug!("Added {} realms to {}", c, &model.name);
-
         Ok(model)
     }
 

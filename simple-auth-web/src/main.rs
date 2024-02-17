@@ -18,8 +18,7 @@ async fn init_defaults(provider: &ServiceFactory<'_>) -> Result<(),ServiceError>
     let realm = realm_service.add_default().await?;
 
     let role_service: RoleService = provider.get_transient();
-    let mut role = role_service.add_default(realm).await?;
-    let realm = role.realms.pop().unwrap();
+    let role = role_service.add_default(realm.name.clone()).await?;
 
     let user_service: UserService = provider.get_transient();
 

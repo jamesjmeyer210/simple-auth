@@ -64,9 +64,9 @@ impl<'r> DbContext<'r> {
         let realm = crud.add("master").await.unwrap();
 
         let crud = self.get_crud::<RoleCrud>();
-        let role = Role::default().with_realm(realm);
-        let mut role = crud.add(role).await.unwrap();
-        let realm = role.realms.pop().unwrap();
+
+        let role = Role::default();
+        let role = crud.add(role).await.unwrap();
 
         let user = User::default()
             .with_realm(realm)
