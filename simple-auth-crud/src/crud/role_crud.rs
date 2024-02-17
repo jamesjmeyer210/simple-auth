@@ -53,4 +53,10 @@ impl <'r>RoleCrud<'r> {
         log::debug!("Updated {} roles", c);
         Ok(update.rename)
     }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
+        let _ = self._roles.soft_delete_by_id(id).await?;
+        log::debug!("Soft-deleted role: \"{}\"", id);
+        Ok(())
+    }
 }

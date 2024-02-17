@@ -1,4 +1,4 @@
-use actix_web::{get, patch, post, Responder, web};
+use actix_web::{delete, get, patch, post, Responder, web};
 use actix_web::web::{ServiceConfig};
 use simple_auth_model::role::RoleUpdate;
 use crate::api::{HttpContext, WebApi};
@@ -14,6 +14,7 @@ impl WebApi for RoleApi {
         cfg.service(get_by_id);
         cfg.service(add);
         cfg.service(update);
+        cfg.service(soft_delete_by_id);
     }
 }
 
@@ -45,4 +46,11 @@ pub async fn update(role: web::Json<RoleUpdate>, factory: web::Data<ServiceFacto
     let service: RoleService = factory.get_transient();
     let result = service.update(role.into_inner()).await;
     HttpContext::accepted(result)
+}
+
+#[delete("/role/{id}")]
+pub async fn soft_delete_by_id(id: web::Path<String>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
+    let service: RoleService = factory.get_transient();
+    let result = service.soft_delete_by_id(id.as_str()).await;
+    HttpContext::no_content(result)
 }

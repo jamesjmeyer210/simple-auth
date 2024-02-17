@@ -79,4 +79,11 @@ impl <'r>RoleService<'r> {
             .await
             .map_err(|e|ServiceError::from(e))
     }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(),ServiceError> {
+        let role_curd = self.db_context.get_crud::<RoleCrud>();
+        role_curd.soft_delete_by_id(id)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
 }

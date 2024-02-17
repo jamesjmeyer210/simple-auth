@@ -1,3 +1,4 @@
+use simple_auth_model::chrono::Utc;
 use simple_auth_model::role::RoleUpdate;
 use crate::abs::table::Table;
 use crate::entity::{Count, RoleEntity};
@@ -65,6 +66,20 @@ impl<'r> Table<'r, RoleEntity> {
             .bind(&update.rename)
             .bind(&update.max)
             .bind(&update.name)
+            .execute(&*self.pool)
+            .await
+            .map(|e|e.rows_affected())
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `roles`
+            SET `deleted_on` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&Utc::now())
+            .bind(id)
             .execute(&*self.pool)
             .await
             .map(|e|e.rows_affected())
