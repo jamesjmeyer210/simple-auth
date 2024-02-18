@@ -1,0 +1,17 @@
+{
+  "server": {
+    "domain": "127.0.0.1",
+    "port": 7777,
+    "workers": null,
+    "allowed_origins": []
+  },
+  "database": {
+    "Sqlite": "InMemory"
+  },
+  "security": {
+    "jwt_signature_scheme": "Secret"
+  },
+  "log_file": "logcfg.test.yaml",
+  "print": false,
+  "banner": null
+}

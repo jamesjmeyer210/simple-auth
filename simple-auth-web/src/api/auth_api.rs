@@ -1,9 +1,10 @@
 use actix_web::{HttpResponse, post, Responder, web};
 use actix_web::web::{ServiceConfig};
+use simple_auth_model::auth::PasswordLogin;
 use simple_auth_model::Password;
 use crate::api::{HttpContext, WebApi};
 use crate::di::{ServiceFactory, TransientFactory};
-use crate::dto::{PasswordLoginDto, ProblemDetails};
+use crate::dto::{ProblemDetails};
 use crate::dto::oauth::ResourceOwnerPasswordResponse;
 use crate::service::AuthService;
 
@@ -16,7 +17,7 @@ impl WebApi for AuthApi {
 }
 
 #[post("token")]
-async fn login(dto: web::Json<PasswordLoginDto>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
+async fn login(dto: web::Json<PasswordLogin>, factory: web::Data<ServiceFactory<'_>>) -> impl Responder {
     let dto = dto.into_inner();
 
     let pass = Password::try_from(dto.password.as_str());
