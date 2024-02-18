@@ -88,13 +88,20 @@ impl<'r> Table<'r, RoleEntity> {
 
 #[cfg(test)]
 mod test {
+    use simple_auth_model::Role;
     use crate::db::db_context::DbContext;
-    use crate::entity::RoleEntity;
+    use crate::entity::{RealmEntity, RoleEntity};
 
     #[sqlx::test]
     async fn all_returns_entities() {
         let db = DbContext::in_memory().await.unwrap();
-        let role = RoleEntity::from("root");
+
+        let realm = RealmEntity::from("master");
+        let result = db.realms.add(&realm).await;
+        assert!(result.is_ok());
+
+        let role = Role::default().with_realm(realm.name);
+        let role = RoleEntity::from(&role);
 
         let x = db.roles.add(&role).await;
         assert!(x.is_ok());
