@@ -8,11 +8,11 @@ impl<'r> Table<'r, UserEntity> {
             r#"
             INSERT INTO users (`id`, `name`, `password`, `created_on`, `deleted_on`)
             VALUES(?, ?, ?, ?, ?)"#)
-            .bind(&model.id)
+            .bind(model.id)
             .bind(&model.name)
             .bind(&model.password.as_ref().map(|p|p.to_vec()))
-            .bind(&model.created_on)
-            .bind(&model.deleted_on)
+            .bind(model.created_on)
+            .bind(model.deleted_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())

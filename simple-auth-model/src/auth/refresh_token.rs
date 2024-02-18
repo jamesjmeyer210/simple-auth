@@ -12,8 +12,8 @@ pub struct RefreshToken {
 impl RefreshToken {
     pub fn new(user_id: &Uuid, issued_on: &DateTime<Utc>) -> RefreshToken {
         Self {
-            user_id: user_id.clone(),
-            issued_on: issued_on.clone(),
+            user_id: *user_id,
+            issued_on: *issued_on,
         }
     }
 }

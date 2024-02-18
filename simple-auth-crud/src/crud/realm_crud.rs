@@ -59,7 +59,7 @@ impl <'r>RealmCrud<'r> {
     }
 
     pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
-        let c = self._realms.soft_delete_by_id(id).await?;
+        let _c = self._realms.soft_delete_by_id(id).await?;
         log::debug!("Soft-deleted {}", id);
         Ok(())
     }

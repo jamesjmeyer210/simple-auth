@@ -1,7 +1,7 @@
 use sqlx::{query_as, QueryBuilder, Sqlite};
 use simple_auth_model::uuid::Uuid;
 use crate::abs::join_table::JoinTable;
-use crate::entity::{RealmEntity, RoleEntity, UserEntity};
+use crate::entity::{RoleEntity, UserEntity};
 
 impl <'r>JoinTable<'r, UserEntity, RoleEntity> {
     pub(crate) async fn add_roles_to_user(&self, user_id: &Uuid, realms: &Vec<&String>)

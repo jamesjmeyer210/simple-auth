@@ -3,9 +3,9 @@ use sqlx::sqlite::SqliteRow;
 
 pub struct Count(u32);
 
-impl Into<u32> for Count {
-    fn into(self) -> u32 {
-        self.0
+impl From<Count> for u32 {
+    fn from(val: Count) -> Self {
+        val.0
     }
 }
 

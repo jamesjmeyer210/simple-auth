@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use actix_web::dev::Service;
+
 use simple_auth_crud::error::CrudError;
 use simple_auth_crud::sqlx;
 
@@ -32,7 +32,7 @@ impl From<CrudError> for ServiceError {
 }
 
 impl Display for ServiceError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, _f: &mut Formatter<'_>) -> std::fmt::Result {
         todo!()
     }
 }

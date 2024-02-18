@@ -63,8 +63,7 @@ mod test {
 
     #[test]
     fn is_jwt_returns_true() {
-        let jwts = vec![
-            "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
+        let jwts = ["eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
             .eyJuYW1lIjoicm9vdCIsInJvbGVzIjpbIm1hc3RlciJdLCJyZWFsbXMiOlsicm9vdCJdLCJhdXRoX3RpbWUiOiIyMDI0LTAxLTI0VDAwOjM4OjI3Ljc4NjI2MDg0OFoifQ\
             .0z9gpqJIeISaqdQkhzl_Jj8Fi0yepYDD_5MvMqgB3bQ",
             "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
@@ -75,11 +74,10 @@ mod test {
             .q3y4J7CDbtl390n7NTIejYpZPC3R8zs8m-B4GERJOyQ",
             "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ\
             .eyJuYW1lIjoicm9vdCIsInVzZXJfaWQiOiIyYWNmMTRlYi04NmViLTRjYWMtYTJlZC1hMTAzYTJjNzM1YTQiLCJyb2xlcyI6WyJyb290Il0sInJlYWxtcyI6WyJtYXN0ZXIiXSwiYXV0aF90aW1lIjoiMjAyNC0wMS0yNVQxODozOTowOS40NjcxNTExNzFaIn0\
-            .d7coCxgIjpDSDft9D63aNRX9plDw3JBxIrUGfkK7sVA"
-        ];
+            .d7coCxgIjpDSDft9D63aNRX9plDw3JBxIrUGfkK7sVA"];
 
         for jwt in jwts.iter() {
-            assert!(JwtStr::is_jwt(*jwt));
+            assert!(JwtStr::is_jwt(jwt));
             let jwt_str = JwtStr::try_from(*jwt);
             assert!(jwt_str.is_ok());
             let parts = jwt_str.unwrap().into_parts();

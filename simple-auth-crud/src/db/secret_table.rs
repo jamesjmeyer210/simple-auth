@@ -10,7 +10,7 @@ impl <'r>Table<'r, SecretEntity> {
             "#)
             .bind(&model.key)
             .bind(&model.value_enc)
-            .bind(&model.expires_on)
+            .bind(model.expires_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())

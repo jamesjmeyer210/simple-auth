@@ -11,10 +11,10 @@ impl<'r> Table<'r, RoleEntity> {
             VALUES(?, ?, ?, ?, ?)
             "#)
             .bind(&model.name)
-            .bind(&model.max)
+            .bind(model.max)
             .bind(&model.realm_id)
-            .bind(&model.created_on)
-            .bind(&model.deleted_on)
+            .bind(model.created_on)
+            .bind(model.deleted_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
@@ -64,7 +64,7 @@ impl<'r> Table<'r, RoleEntity> {
             WHERE `name` = ?
             "#)
             .bind(&update.rename)
-            .bind(&update.max)
+            .bind(update.max)
             .bind(&update.name)
             .execute(&*self.pool)
             .await
@@ -78,7 +78,7 @@ impl<'r> Table<'r, RoleEntity> {
             SET `deleted_on` = ?
             WHERE `name` = ?
             "#)
-            .bind(&Utc::now())
+            .bind(Utc::now())
             .bind(id)
             .execute(&*self.pool)
             .await
@@ -88,13 +88,20 @@ impl<'r> Table<'r, RoleEntity> {
 
 #[cfg(test)]
 mod test {
+    use simple_auth_model::Role;
     use crate::db::db_context::DbContext;
-    use crate::entity::RoleEntity;
+    use crate::entity::{RealmEntity, RoleEntity};
 
     #[sqlx::test]
     async fn all_returns_entities() {
         let db = DbContext::in_memory().await.unwrap();
-        let role = RoleEntity::from("root");
+
+        let realm = RealmEntity::from("master");
+        let result = db.realms.add(&realm).await;
+        assert!(result.is_ok());
+
+        let role = Role::default().with_realm(realm.name);
+        let role = RoleEntity::from(&role);
 
         let x = db.roles.add(&role).await;
         assert!(x.is_ok());

@@ -12,8 +12,8 @@ impl<'r> Table<'r, RealmEntity> {
             VALUES(?, ?, ?)
             "#)
             .bind(&model.name)
-            .bind(&model.created_on)
-            .bind(&model.deleted_on)
+            .bind(model.created_on)
+            .bind(model.deleted_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
@@ -105,7 +105,7 @@ impl<'r> Table<'r, RealmEntity> {
             SET `deleted_on` = ?
             WHERE `name` = ?
             "#)
-            .bind(&Utc::now())
+            .bind(Utc::now())
             .bind(id)
             .execute(&*self.pool)
             .await

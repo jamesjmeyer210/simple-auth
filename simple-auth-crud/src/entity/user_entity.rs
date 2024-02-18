@@ -22,7 +22,7 @@ impl Default for UserEntity {
             password: Password::try_from("password123")
                 .map(|p|PasswordHash::try_from(&p))
                 .unwrap()
-                .map(|h|Some(h))
+                .map(Some)
                 .unwrap(),
             created_on: Utc::now(),
             deleted_on: None
@@ -37,7 +37,7 @@ impl From<&User> for UserEntity {
             name: value.name.clone(),
             password: value.password
                 .as_ref()
-                .map(|p|PasswordHash::try_from(p))
+                .map(PasswordHash::try_from)
                 .and_then(|x|x.ok()),
             created_on: value.created_on,
             deleted_on: value.deleted_on
@@ -45,28 +45,28 @@ impl From<&User> for UserEntity {
     }
 }
 
-impl Into<User> for UserEntity {
-    fn into(self) -> User {
+impl From<UserEntity> for User {
+    fn from(val: UserEntity) -> Self {
         User {
-            id: self.id,
-            name: self.name,
+            id: val.id,
+            name: val.name,
             password: None,
             contact_info: Vec::with_capacity(0),
             public_key: Vec::with_capacity(0),
             roles: Vec::with_capacity(0),
             realms: Vec::with_capacity(0),
-            created_on: self.created_on,
+            created_on: val.created_on,
             deleted_on: None,
         }
     }
 }
 
-impl Into<PartialUser> for UserEntity {
-    fn into(self) -> PartialUser {
+impl From<UserEntity> for PartialUser {
+    fn from(val: UserEntity) -> Self {
         PartialUser {
-            id: self.id,
-            name: self.name,
-            created_on: self.created_on,
+            id: val.id,
+            name: val.name,
+            created_on: val.created_on,
         }
     }
 }

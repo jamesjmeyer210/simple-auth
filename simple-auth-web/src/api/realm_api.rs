@@ -1,6 +1,6 @@
 use actix_web::{delete, get, HttpResponse, patch, post, Responder, web};
 use actix_web::http::StatusCode;
-use actix_web::web::{delete, ServiceConfig};
+use actix_web::web::{ServiceConfig};
 use simple_auth_model::realm::UpdateRealm;
 use crate::api::{HttpContext, WebApi};
 use crate::di::{ServiceFactory, TransientFactory};

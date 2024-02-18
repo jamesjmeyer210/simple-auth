@@ -15,8 +15,8 @@ impl Jwt {
         let h = self.header.as_json().unwrap();
         let c = self.claims.as_json().unwrap();
         format!("{}.{}.{}",
-            URL_SAFE_NO_PAD.encode(&h),
-            URL_SAFE_NO_PAD.encode(&c),
+            URL_SAFE_NO_PAD.encode(h),
+            URL_SAFE_NO_PAD.encode(c),
             URL_SAFE_NO_PAD.encode(self.signature.as_slice()))
     }
 }

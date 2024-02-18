@@ -12,7 +12,7 @@ impl Default for Secret {
     fn default() -> Self {
         let key = Aes256Gcm::generate_key(OsRng);
         Self {
-            key: key.try_into().unwrap()
+            key: key.into()
         }
     }
 }
