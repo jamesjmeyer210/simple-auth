@@ -2,7 +2,8 @@
   "server": {
     "domain": "localhost",
     "port": 999,
-    "workers": 100
+    "workers": 100,
+    "allowed_origins": []
   },
   "database": {
     "Sqlite": "InMemory"

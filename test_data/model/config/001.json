@@ -2,7 +2,8 @@
   "server": {
     "domain": "cfg.test.domain",
     "port": 9000,
-    "workers": null
+    "workers": null,
+    "allowed_origins": []
   },
   "database": {
     "Sqlite": {
