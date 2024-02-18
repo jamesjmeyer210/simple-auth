@@ -1,4 +1,6 @@
 use sqlx::{Execute, FromRow, QueryBuilder, Sqlite};
+use simple_auth_model::chrono::Utc;
+use simple_auth_model::realm::UpdateRealm;
 use crate::abs::table::Table;
 use crate::entity::{Count, RealmEntity};
 
@@ -80,6 +82,34 @@ impl<'r> Table<'r, RealmEntity> {
             .bind(id)
             .fetch_one(&*self.pool)
             .await
+    }
+
+    pub async fn update(&self, update: &UpdateRealm) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `realms`
+            SET `name` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&update.rename)
+            .bind(&update.name)
+            .execute(&*self.pool)
+            .await
+            .map(|x|x.rows_affected())
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `realms`
+            SET `deleted_on` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&Utc::now())
+            .bind(id)
+            .execute(&*self.pool)
+            .await
+            .map(|x|x.rows_affected())
     }
 }
 

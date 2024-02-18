@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use simple_auth_model::Realm;
+use simple_auth_model::realm::UpdateRealm;
 use crate::abs::table::Table;
 use crate::db::DbContext;
 use crate::entity::RealmEntity;
@@ -49,6 +50,18 @@ impl <'r>RealmCrud<'r> {
         self._realms.count_by_name(realm)
             .await
             .map(|x|x == 1)
+    }
+
+    pub async fn update(&self, update: UpdateRealm) -> Result<String, sqlx::Error> {
+        let c = self._realms.update(&update).await?;
+        log::debug!("{} realms updated", c);
+        Ok(update.rename)
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
+        let c = self._realms.soft_delete_by_id(id).await?;
+        log::debug!("Soft-deleted {}", id);
+        Ok(())
     }
 }
 

@@ -2,6 +2,7 @@ use std::sync::Arc;
 use simple_auth_crud::crud::RealmCrud;
 use simple_auth_crud::DbContext;
 use simple_auth_model::Realm;
+use simple_auth_model::realm::UpdateRealm;
 use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
 use crate::service::Service;
@@ -58,17 +59,23 @@ impl <'r>RealmService<'r> {
             .map_err(|e|ServiceError::from(e))
     }
 
-    /*pub async fn get_all(&self) -> Result<Vec<Realm>,ServiceError> {
-        let crud = self.db_context.get_crud::<RealmCrud>();
-
-        crud.get_all()
-            .await
-            .map_err(|e|ServiceError::from(e))
-    }*/
-
     pub async fn get_by_id(&self, id: &str) -> Result<Realm,ServiceError> {
         let crud = self.db_context.get_crud::<RealmCrud>();
         crud.get_by_id(id)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
+
+    pub async fn update(&self, update: UpdateRealm) -> Result<String, ServiceError> {
+        let crud = self.db_context.get_crud::<RealmCrud>();
+        crud.update(update)
+            .await
+            .map_err(|e|ServiceError::from(e))
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), ServiceError> {
+        let crud = self.db_context.get_crud::<RealmCrud>();
+        crud.soft_delete_by_id(id)
             .await
             .map_err(|e|ServiceError::from(e))
     }

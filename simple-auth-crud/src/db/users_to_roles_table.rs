@@ -25,7 +25,7 @@ impl <'r>JoinTable<'r, UserEntity, RoleEntity> {
     pub(crate) async fn get_roles_by_user_id(&self, user_id: &Uuid) -> Result<Vec<RoleEntity>,sqlx::Error> {
         query_as(
             r#"
-            select `name`, `max`, `created_on`, `deleted_on`
+            select `name`, `max`, `realm_id`, `created_on`, `deleted_on`
             from `roles` as `a`
             where `a`.`name` = (
                 select `role_id`

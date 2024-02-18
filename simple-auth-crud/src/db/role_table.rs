@@ -1,3 +1,5 @@
+use simple_auth_model::chrono::Utc;
+use simple_auth_model::role::RoleUpdate;
 use crate::abs::table::Table;
 use crate::entity::{Count, RoleEntity};
 
@@ -5,11 +7,12 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn add(&self, model: &RoleEntity) -> Result<u64, sqlx::Error> {
         sqlx::query(
             r#"
-            INSERT INTO `roles` (`name`, `max`, `created_on`, `deleted_on`)
-            VALUES(?, ?, ?, ?)
+            INSERT INTO `roles` (`name`, `max`, `realm_id`, `created_on`, `deleted_on`)
+            VALUES(?, ?, ?, ?, ?)
             "#)
             .bind(&model.name)
             .bind(&model.max)
+            .bind(&model.realm_id)
             .bind(&model.created_on)
             .bind(&model.deleted_on)
             .execute(&*self.pool)
@@ -31,7 +34,7 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn all(&self) -> Result<Vec<RoleEntity>, sqlx::Error> {
         sqlx::query_as(
             r#"
-            SELECT `name`, `max`, `created_on`, `deleted_on`
+            SELECT `name`, `max`, `realm_id`, `created_on`, `deleted_on`
             FROM `roles`
             WHERE `deleted_on` IS NULL
             "#,)
@@ -42,13 +45,44 @@ impl<'r> Table<'r, RoleEntity> {
     pub async fn get_by_id(&self, id: &str) -> Result<RoleEntity, sqlx::Error> {
         sqlx::query_as(
             r#"
-            SELECT `name`, `max`, `created_on`, `deleted_on`
+            SELECT `name`, `max`, `created_on`, `realm_id`, `deleted_on`
             FROM `roles` AS `a`
             WHERE `deleted_on` IS NULL AND `a`.`name` = ?
             "#,)
             .bind(id)
             .fetch_one(&*self.pool)
             .await
+    }
+
+    pub async fn update(&self, update: &RoleUpdate) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `roles`
+            SET
+                `name` = ?,
+                `max` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&update.rename)
+            .bind(&update.max)
+            .bind(&update.name)
+            .execute(&*self.pool)
+            .await
+            .map(|e|e.rows_affected())
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<u64, sqlx::Error> {
+        sqlx::query(
+            r#"
+            UPDATE `roles`
+            SET `deleted_on` = ?
+            WHERE `name` = ?
+            "#)
+            .bind(&Utc::now())
+            .bind(id)
+            .execute(&*self.pool)
+            .await
+            .map(|e|e.rows_affected())
     }
 }
 

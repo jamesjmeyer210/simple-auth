@@ -35,6 +35,7 @@ impl <'r>AuthService<'r> {
         self.secret_store.validate_jwt(&jwt)
     }
 
+    /// Retrieves the user and returns their details in the format of JWT claims
     pub async fn get_resource_owner_tokens(&self, user_name: String, password: Password) -> Result<ResourceOwnerTokens,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
         let user = crud.get_full_by_name(&user_name, password).await?;

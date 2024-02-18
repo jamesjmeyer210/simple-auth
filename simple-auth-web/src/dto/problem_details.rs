@@ -92,7 +92,7 @@ impl From<ServiceError> for ProblemDetails<'_> {
                     Error::RowNotFound => ProblemDetails::new(StatusCode::NOT_FOUND, "Not Found"),
                     Error::TypeNotFound { .. } => todo!(),
                     Error::ColumnIndexOutOfBounds { .. } => ProblemDetails::new(StatusCode::RANGE_NOT_SATISFIABLE, "Range Not Satisfiable"),
-                    Error::ColumnNotFound(_) => todo!(),
+                    Error::ColumnNotFound(_) => ProblemDetails::new(StatusCode::NOT_IMPLEMENTED, "Column not found"),
                     Error::ColumnDecode { .. } => todo!(),
                     Error::Decode(_) => todo!(),
                     Error::AnyDriverError(_) => todo!(),

@@ -1,7 +1,11 @@
+mod update_realm;
+
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::role::Role;
 use crate::user::User;
+
+pub type UpdateRealm = update_realm::UpdateRealm;
 
 #[derive(Debug, Serialize)]
 pub struct Realm {

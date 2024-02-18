@@ -6,19 +6,9 @@ use simple_auth_model::Role;
 pub(crate) struct RoleEntity {
     pub name: String,
     pub max: Option<u32>,
+    pub realm_id: String,
     pub created_on: DateTime<Utc>,
     pub deleted_on: Option<DateTime<Utc>>
-}
-
-impl From<&str> for RoleEntity {
-    fn from(value: &str) -> Self {
-        Self {
-            name: value.to_string(),
-            max: None,
-            created_on: Utc::now(),
-            deleted_on: None
-        }
-    }
 }
 
 impl From<&Role> for RoleEntity {
@@ -26,6 +16,7 @@ impl From<&Role> for RoleEntity {
         Self {
             name: value.name.clone(),
             max: value.max,
+            realm_id: value.realm.clone(),
             created_on: value.created_on,
             deleted_on: None,
         }
@@ -38,7 +29,7 @@ impl Into<Role> for RoleEntity {
             name: self.name,
             max: self.max,
             created_on: self.created_on,
-            realms: Vec::with_capacity(0),
+            realm: self.realm_id,
         }
     }
 }
@@ -48,6 +39,7 @@ impl <'r>FromRow<'r, SqliteRow> for RoleEntity {
         Ok(Self {
             name: row.try_get("name")?,
             max: row.try_get("max")?,
+            realm_id: row.try_get("realm_id")?,
             created_on: row.try_get("created_on")?,
             deleted_on: row.try_get("deleted_on")?
         })

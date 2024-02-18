@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use simple_auth_model::Role;
+use simple_auth_model::role::RoleUpdate;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::db::DbContext;
@@ -30,16 +31,6 @@ impl <'r>RoleCrud<'r> {
         let entity = RoleEntity::from(&model);
         let c = self._roles.add(&entity).await?;
         log::debug!("Added {} role", c);
-
-        if model.realms.len() == 0 {
-            log::warn!("No realms associated with {}", &model.name);
-            return Ok(model);
-        }
-
-        let realms: Vec<&String> = model.realms.iter().map(|x|&x.name).collect();
-        let c = self._roles_to_realms.add_realms_to_role(&model.name, &realms).await?;
-        log::debug!("Added {} realms to {}", c, &model.name);
-
         Ok(model)
     }
 
@@ -55,5 +46,17 @@ impl <'r>RoleCrud<'r> {
         self._roles.get_by_id(id)
             .await
             .map(|x|x.into())
+    }
+
+    pub async fn update(&self, update: RoleUpdate) -> Result<String, sqlx::Error> {
+        let c = self._roles.update(&update).await?;
+        log::debug!("Updated {} roles", c);
+        Ok(update.rename)
+    }
+
+    pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
+        let _ = self._roles.soft_delete_by_id(id).await?;
+        log::debug!("Soft-deleted role: \"{}\"", id);
+        Ok(())
     }
 }

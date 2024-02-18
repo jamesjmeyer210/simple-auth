@@ -89,7 +89,10 @@ impl <'r>UserCrud<'r> {
             .map(|x|x.into())
     }
 
+    /// Retrieves a full user - a user with all their roles and realm information
     pub async fn get_full_by_name(&self, name: &str, password: Password) -> Result<FullUser,CrudError> {
+        log::debug!("Retrieving full user by name: \"{}\"", name);
+
         let entity: UserEntity = self.users.get_by_name(name).await?;
         if !entity.password.is_some() {
             return Err(CrudError::ValueIsNone);
@@ -101,6 +104,7 @@ impl <'r>UserCrud<'r> {
         }
 
         let user: PartialUser = entity.into();
+        log::debug!("Retrieved partial user info for \"{}\"", name);
 
         // TODO: complex mappings such as these ought to go somewhere else
         let contact_info: Vec<ContactInfo> = self.contacts.get_by_user_id(&user.id)
@@ -117,6 +121,7 @@ impl <'r>UserCrud<'r> {
                 }
             })
             .collect();
+        log::debug!("Retrieved contact info for \"{}\"", name);
 
         // TODO: break this apart into smaller functions
         let realms: Vec<String> = self.realms.get_realms_by_user_id(&user.id)
@@ -124,12 +129,16 @@ impl <'r>UserCrud<'r> {
             .drain(0..)
             .map(|x|x.name)
             .collect();
+        log::debug!("Retrieved realms of \"{}\"", name);
+
         // TODO: break this apart into smaller functions
         let roles: Vec<String> = self.roles.get_roles_by_user_id(&user.id)
             .await?
             .drain(0..)
             .map(|x|x.name)
             .collect();
+        log::debug!("Retrieved roles of \"{}\"", name);
+
         Ok(FullUser::new(user, contact_info, roles, realms))
     }
 
