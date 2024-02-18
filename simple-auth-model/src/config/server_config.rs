@@ -1,10 +1,11 @@
 use serde::{Deserialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct ServerConfig {
     pub domain: String,
     pub port: u16,
-    pub workers: Option<usize>
+    pub workers: Option<usize>,
+    pub allowed_origins: Vec<String>,
 }
 
 impl Default for ServerConfig {
@@ -13,6 +14,7 @@ impl Default for ServerConfig {
             domain: String::from("127.0.0.1"),
             port: 7777,
             workers: None,
+            allowed_origins: Vec::with_capacity(0)
         }
     }
 }

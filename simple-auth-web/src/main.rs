@@ -1,4 +1,7 @@
-use actix_web::{App, HttpServer, web};
+use std::rc::Rc;
+use std::sync::Arc;
+use actix_cors::Cors;
+use actix_web::{App, http, HttpServer, web};
 use actix_web::middleware::Logger;
 use actix_web_httpauth::middleware::HttpAuthentication;
 use simple_auth_crud::DbContext;
@@ -64,12 +67,27 @@ async fn main() -> std::io::Result<()> {
     log::info!("Pre-server start complete!");
 
     let provider = web::Data::new(factory);
+    let server_config = config.server.clone();
 
     let mut server = HttpServer::new(move || {
+
+        let origin = server_config.domain.clone();
+        let allowed_origins: Arc<Vec<String>> = Arc::new(server_config.allowed_origins.clone());
+
         let authentication_middleware = HttpAuthentication::bearer(SimpleAuthMiddleware::authenticate_bearer);
+        let cors_middleware = Cors::default()
+            .allow_any_origin()
+            .allowed_origin(origin.as_str())
+            .allowed_origin_fn(move |origin, _req_head|{
+                allowed_origins.iter().any(|x|x.as_bytes().eq(origin.as_bytes()))
+            })
+            .allow_any_method()
+            .allow_any_header();
+
         App::new()
             .app_data(provider.clone())
             .wrap(Logger::default())
+            .wrap(cors_middleware)
             .service(
                 web::scope("/v1/api")
                     .wrap(authentication_middleware)

@@ -2,7 +2,13 @@
   "server": {
     "domain": "127.0.0.1",
     "port": 7777,
-    "workers": null
+    "workers": null,
+    "allowed_origins": [
+      "localhost:4200",
+      "127.0.0.1:4200",
+      "http://localhost:4200",
+      "http://127.0.0.1:4200"
+    ]
   },
   "database": {
     "Sqlite": {

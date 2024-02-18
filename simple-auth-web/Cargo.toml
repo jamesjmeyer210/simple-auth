@@ -20,5 +20,6 @@ simple-auth-crud = { path = "../simple-auth-crud" }
 actix-web = "4.3.1"
 actix-rt = "2.8.0"
 actix-web-httpauth = "0.8.1"
+actix-cors = "0.7.0"
 log = "0.4.20"
 serde = { version = "1.0", features = ["derive"] }
