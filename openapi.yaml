@@ -79,6 +79,9 @@ paths:
       required: true
       schema:
         type: string
+#
+# Role API
+#
   /v1/api/role:
     get:
       tags:
@@ -113,6 +116,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoleDto'
+    patch:
+      tags:
+      - role
+      summary: Updates a role
+      operationId: update_role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
   /v1/api/role/{role}:
     get:
       tags:
@@ -127,12 +140,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoleDto'
+    delete:
+      tags:
+        - role
+      summary: Soft delete a role by its id
+      operationId: delete_role_by_id
+      responses:
+        '204':
+          description: 'The role has been removed'
     parameters:
-    - name: role
-      in: path
-      required: true
-      schema:
-        type: string
+      - name: role
+        in: path
+        required: true
+        schema:
+          type: string
+#
+# User API
+#
   /v1/api/user/{page}:
     get:
       tags:
@@ -315,6 +339,18 @@ components:
         created_on:
           type: string
           example: '2024-01-27T21:29:45.325285645Z'
+    RoleUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'foo'
+        rename:
+          type: string
+          example: 'bar'
+          description: 'The new name for the role'
+        max:
+          type: integer
     RealmDto:
       type: object
       properties:
