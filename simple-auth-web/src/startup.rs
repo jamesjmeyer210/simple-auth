@@ -2,18 +2,18 @@ use std::io;
 use std::rc::Rc;
 use std::sync::Arc;
 use actix_cors::Cors;
-use actix_web::{App, web};
-use actix_web::middleware::Logger;
-use actix_web::web::Data;
-use actix_web_httpauth::middleware::HttpAuthentication;
+
+
+
+
 use simple_auth_crud::crypto::SecretStore;
 use simple_auth_crud::DbContext;
 use simple_auth_model::config::{Config, DatabaseConfig, ServerConfig, SqliteConfig};
 use simple_auth_model::log4rs;
-use crate::api::{OAuthApiV1, SimpleAuthApiV1, WebApi};
+
 use crate::di::{ServiceFactory, TransientFactory};
 use crate::error::ServiceError;
-use crate::middleware::SimpleAuthMiddleware;
+
 use crate::service::{RealmService, RoleService, UserService};
 
 pub struct Startup;

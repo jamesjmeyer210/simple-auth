@@ -48,27 +48,27 @@ impl <'r>UserService<'r> {
         let crud = self.db_context.get_crud::<UserCrud>();
         crud.get_by_id(id)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn get_by_name(&self, name: &str) -> Result<User,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
         crud.get_by_name(name)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn get_by_contact(&self, contact: &str) -> Result<User,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
         crud.get_by_contact(contact)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn get_page(&self, page: u32) -> Result<LimitVec<User>,ServiceError> {
         let crud = self.db_context.get_crud::<UserCrud>();
         crud.get_limited_range(100, page * 100)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 }

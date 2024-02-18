@@ -23,6 +23,12 @@ pub struct ServiceFactory<'r> {
     secret_store: Option<Arc<SecretStore>>,
 }
 
+impl Default for ServiceFactory<'_> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ServiceFactory<'_> {
     pub fn new() -> Self {
         Self {
@@ -31,7 +37,7 @@ impl ServiceFactory<'_> {
         }
     }
 
-    pub fn add_singleton<T>(mut self, singleton: T) -> Self
+    pub fn add_singleton<T>(self, singleton: T) -> Self
         where Self: SingletonFactory<T>
     {
         <Self as SingletonFactory<T>>::add_singleton(self, singleton)

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use simple_auth_crud::crud::{RealmCrud, RoleCrud};
 use simple_auth_crud::DbContext;
-use simple_auth_model::{Realm, Role};
+use simple_auth_model::{Role};
 use simple_auth_model::role::RoleUpdate;
 use crate::di::{ServiceFactory};
 use crate::error::ServiceError;
@@ -25,7 +25,7 @@ impl <'r>Service<Role> for RoleService<'r> {
         log::debug!("Retrieving all roles");
         crud.get_all()
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 }
 
@@ -35,7 +35,7 @@ impl <'r>RoleService<'r> {
         log::debug!("Retrieving role \"{}\"", id);
         crud.get_by_id(id)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn add_default(&self, realm: String) -> Result<Role,ServiceError> {
@@ -51,7 +51,7 @@ impl <'r>RoleService<'r> {
 
         let role = crud.add(role)
             .await
-            .map_err(|e|ServiceError::from(e))?;
+            .map_err(ServiceError::from)?;
 
         log::debug!("Added role {}", &role.name);
         Ok(role)
@@ -63,27 +63,27 @@ impl <'r>RoleService<'r> {
 
         let realm = realm_crud.get_by_id(&realm)
             .await
-            .map_err(|e|ServiceError::from(e))?;
+            .map_err(ServiceError::from)?;
 
         let role = Role::new(name, max, &realm);
 
         let role_crud = self.db_context.get_crud::<RoleCrud>();
         role_crud.add(role)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn update(&self, update: RoleUpdate) -> Result<String,ServiceError> {
         let role_curd = self.db_context.get_crud::<RoleCrud>();
         role_curd.update(update)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn soft_delete_by_id(&self, id: &str) -> Result<(),ServiceError> {
         let role_curd = self.db_context.get_crud::<RoleCrud>();
         role_curd.soft_delete_by_id(id)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 }

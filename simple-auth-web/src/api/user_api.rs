@@ -1,5 +1,5 @@
 use actix_web::{get, HttpResponse, post, Responder, web};
-use actix_web::web::{service, ServiceConfig};
+use actix_web::web::{ServiceConfig};
 use serde::Deserialize;
 use simple_auth_model::{ContactInfo, Password, User};
 use simple_auth_model::uuid::Uuid;

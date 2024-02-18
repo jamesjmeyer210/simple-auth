@@ -25,7 +25,7 @@ impl <'r>Service<Realm> for RealmService<'r> {
 
         crud.get_all()
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 }
 
@@ -37,7 +37,7 @@ impl <'r>RealmService<'r> {
 
         let exists = crud.contains(&realm.name)
             .await
-            .map_err(|e|ServiceError::from(e))?;
+            .map_err(ServiceError::from)?;
 
         if exists {
             log::debug!("Default realm {} exists", &realm.name);
@@ -46,7 +46,7 @@ impl <'r>RealmService<'r> {
 
         let realm = crud.add(&realm.name)
             .await
-            .map_err(|e|ServiceError::from(e))?;
+            .map_err(ServiceError::from)?;
 
         log::debug!("Added default realm {}", &realm.name);
         Ok(realm)
@@ -56,28 +56,28 @@ impl <'r>RealmService<'r> {
         let crud = self.db_context.get_crud::<RealmCrud>();
         crud.add(realm)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn get_by_id(&self, id: &str) -> Result<Realm,ServiceError> {
         let crud = self.db_context.get_crud::<RealmCrud>();
         crud.get_by_id(id)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn update(&self, update: UpdateRealm) -> Result<String, ServiceError> {
         let crud = self.db_context.get_crud::<RealmCrud>();
         crud.update(update)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 
     pub async fn soft_delete_by_id(&self, id: &str) -> Result<(), ServiceError> {
         let crud = self.db_context.get_crud::<RealmCrud>();
         crud.soft_delete_by_id(id)
             .await
-            .map_err(|e|ServiceError::from(e))
+            .map_err(ServiceError::from)
     }
 }
 

@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder, web};
+use actix_web::{HttpResponse, web};
 use actix_web::web::ServiceConfig;
 use serde::Serialize;
 use crate::api::auth_api::AuthApi;
