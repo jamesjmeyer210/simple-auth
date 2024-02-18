@@ -14,31 +14,20 @@ use crate::crypto::sha_256_hash::Sha256Hash;
 use crate::DbContext;
 use crate::entity::SecretEntity;
 
+#[derive(Default)]
 struct SecretStoreInner {
     enc_key: Secret,
     sig_key: Secret,
 }
 
-impl Default for SecretStoreInner {
-    fn default() -> Self {
-        Self {
-            enc_key: Secret::default(),
-            sig_key: Secret::default(),
-        }
-    }
-}
 
+
+#[derive(Default)]
 pub struct SecretStore {
     inner: Box<SecretStoreInner>
 }
 
-impl Default for SecretStore {
-    fn default() -> Self {
-        Self {
-            inner: Box::new(SecretStoreInner::default())
-        }
-    }
-}
+
 
 impl Debug for SecretStore {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -51,11 +40,11 @@ impl SecretStore {
         &self.inner.enc_key
     }
 
-    fn set_enc_key(&mut self, secret: Secret) -> () {
+    fn set_enc_key(&mut self, secret: Secret) {
         self.inner.enc_key = secret;
     }
 
-    fn set_sig_key(&mut self, secret: Secret) -> () {
+    fn set_sig_key(&mut self, secret: Secret) {
         self.inner.sig_key = secret;
     }
 
@@ -153,7 +142,7 @@ impl <'r>SecretStoreBuilder<'r> {
             let key = fs::read("enc_key").unwrap();
             let encrypted_key = Secret::try_from(key).unwrap();
 
-            let decrypted_secret = encrypted.decrypt::<Secret>(&encrypted_key.as_bytes()).unwrap();
+            let decrypted_secret = encrypted.decrypt::<Secret>(encrypted_key.as_bytes()).unwrap();
 
             store.set_enc_key(decrypted_secret);
         }

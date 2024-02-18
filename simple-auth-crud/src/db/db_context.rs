@@ -76,7 +76,7 @@ impl<'r> DbContext<'r> {
         let secret_store = self.get_secret_store().await.unwrap();
         let crud = self.get_crud::<UserCrud>();
         let _ = crud.add(&user, &secret_store).await.unwrap();
-        return user;
+        user
     }
 }
 
@@ -107,7 +107,7 @@ mod test {
         assert!(db.is_ok());
         let db = db.unwrap();
 
-        let crud = db.get_crud::<RealmCrud>();
+        let _crud = db.get_crud::<RealmCrud>();
     }
 
     #[sqlx::test]

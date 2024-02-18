@@ -11,10 +11,10 @@ impl<'r> Table<'r, RoleEntity> {
             VALUES(?, ?, ?, ?, ?)
             "#)
             .bind(&model.name)
-            .bind(&model.max)
+            .bind(model.max)
             .bind(&model.realm_id)
-            .bind(&model.created_on)
-            .bind(&model.deleted_on)
+            .bind(model.created_on)
+            .bind(model.deleted_on)
             .execute(&*self.pool)
             .await
             .map(|x|x.rows_affected())
@@ -64,7 +64,7 @@ impl<'r> Table<'r, RoleEntity> {
             WHERE `name` = ?
             "#)
             .bind(&update.rename)
-            .bind(&update.max)
+            .bind(update.max)
             .bind(&update.name)
             .execute(&*self.pool)
             .await
@@ -78,7 +78,7 @@ impl<'r> Table<'r, RoleEntity> {
             SET `deleted_on` = ?
             WHERE `name` = ?
             "#)
-            .bind(&Utc::now())
+            .bind(Utc::now())
             .bind(id)
             .execute(&*self.pool)
             .await

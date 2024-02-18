@@ -2,12 +2,12 @@ use std::fmt::{Debug, Formatter};
 use std::mem::size_of;
 use aes_gcm::{AeadCore, AeadInPlace, KeyInit};
 use aes_gcm::aead::{Aead, OsRng, Nonce};
-use aes_gcm::aead::rand_core::RngCore;
+
 use aes_gcm::aes::cipher::{InvalidLength};
-use simple_auth_model::abs::AsBytes;
+
 use crate::error::encryption_error::DecryptionError;
 use crate::crypto::{EncryptionError, PasswordHash};
-use crate::crypto::secret::Secret;
+
 
 pub struct Encrypted<T: KeyInit + AeadCore + AeadInPlace> {
     bytes: Vec<u8>,
@@ -21,7 +21,7 @@ impl <T>Clone for Encrypted<T>
     fn clone(&self) -> Self {
         let bytes = self.bytes.clone();
         let nonce = Nonce::<T>::clone_from_slice(self.nonce.as_slice());
-        Self::new(bytes, nonce, self.salt.clone())
+        Self::new(bytes, nonce, self.salt)
     }
 }
 
@@ -59,34 +59,34 @@ impl<T> Encrypted<T> where T: KeyInit + AeadCore + AeadInPlace {
         where D : TryFrom<Vec<u8>>
     {
         let derivative = PasswordHash::u8_from_bytes(key, &self.salt)
-            .map_err(|e|DecryptionError::Argon2Error(e))?;
+            .map_err(DecryptionError::Argon2Error)?;
 
         let cipher = T::new_from_slice(&derivative)
-            .map_err(|e|DecryptionError::InvalidLength(e))?;
+            .map_err(DecryptionError::InvalidLength)?;
 
         let x = cipher.decrypt(&self.nonce, self.bytes.as_ref())
-            .map_err(|e|DecryptionError::DecryptionFailed)?;
+            .map_err(|_e|DecryptionError::DecryptionFailed)?;
 
-        Ok(D::try_from(x).map_err(|_|DecryptionError::DecryptionFailed)?)
+        D::try_from(x).map_err(|_|DecryptionError::DecryptionFailed)
     }
 }
 
-impl <T>Into<Vec<u8>> for Encrypted<T>
+impl <T>From<Encrypted<T>> for Vec<u8>
     where T: KeyInit + AeadCore + AeadInPlace
 {
-    fn into(self) -> Vec<u8> {
-        let mut raw = Vec::with_capacity(size_of::<u8>() + self.len());
-        raw.push(self.nonce.len() as u8);
+    fn from(val: Encrypted<T>) -> Self {
+        let mut raw = Vec::with_capacity(size_of::<u8>() + val.len());
+        raw.push(val.nonce.len() as u8);
 
-        for i in self.nonce {
+        for i in val.nonce {
             raw.push(i);
         }
 
-        for i in self.salt {
+        for i in val.salt {
             raw.push(i);
         }
 
-        for i in self.bytes {
+        for i in val.bytes {
             raw.push(i);
         }
 
@@ -111,21 +111,18 @@ impl <T>TryFrom<Vec<u8>> for Encrypted<T>
         // read the nonce
         let n: Vec<u8> = value.iter()
             .skip(size_of::<u8>())
-            .take(nonce_len as usize)
-            .map(|x|*x)
+            .take(nonce_len as usize).copied()
             .collect();
         let nonce = Nonce::<T>::clone_from_slice(n.as_slice());
         // read the salt
         let s: Vec<u8> = value.iter()
             .skip(size_of::<u8>() + nonce_len as usize)
-            .take(size_of::<[u8;16]>())
-            .map(|x|*x)
+            .take(size_of::<[u8;16]>()).copied()
             .collect();
         let salt = <[u8;16]>::try_from(s).unwrap();
         // read the encrypted bytes
         let bytes: Vec<u8> = value.iter()
-            .skip(size_of::<u8>() + nonce.len() + salt.len())
-            .map(|x|*x)
+            .skip(size_of::<u8>() + nonce.len() + salt.len()).copied()
             .collect();
         Ok(Encrypted::new(bytes, nonce, salt))
     }
@@ -136,14 +133,14 @@ pub(crate) fn encrypt<T>(data: &[u8], key: &[u8]) -> Result<Encrypted<T>,Encrypt
     where T: KeyInit + AeadCore + AeadInPlace
 {
     let derivative = PasswordHash::try_from(key)
-        .map_err(|e|EncryptionError::Argon2Error(e))?;
+        .map_err(EncryptionError::Argon2Error)?;
 
     let cipher = T::new_from_slice(derivative.hash())
-        .map_err(|e|EncryptionError::InvalidLength(e))?;
+        .map_err(EncryptionError::InvalidLength)?;
 
     let nonce = T::generate_nonce(&mut OsRng);
     let enc = cipher.encrypt(&nonce, data)
-        .map_err(|e|EncryptionError::EncryptionFailed)?;
+        .map_err(|_e|EncryptionError::EncryptionFailed)?;
 
     Ok(Encrypted::new(enc, nonce, derivative.into_salt()))
 }
@@ -193,7 +190,7 @@ mod test {
 
         let enc_a = enc_a.unwrap();
         let raw: Vec<u8> = enc_a.clone().into();
-        assert!(raw.len() > 0);
+        assert!(!raw.is_empty());
 
         let enc_b = Encrypted::<Aes256Gcm>::try_from(raw);
         assert!(enc_b.is_ok());

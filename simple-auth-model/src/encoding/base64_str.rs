@@ -1,4 +1,4 @@
-use std::str::FromStr;
+
 use lazy_regex::regex_is_match;
 
 pub struct Base64Str<'s> {
@@ -29,13 +29,11 @@ mod test {
     use crate::encoding::base64_str::Base64Str;
 
     fn is_base64_returns_true() {
-        let input = vec![
-            "aGVsbG8K",
+        let input = ["aGVsbG8K",
             "aGVsbG8gd29ybGQK",
             "eyJhbGdvIjoiU0hBMjU2IiwiX3R5cGUiOiJKV1QifQ",
             "eyJuYW1lIjoicm9vdCIsInJvbGVzIjpbIm1hc3RlciJdLCJyZWFsbXMiOlsicm9vdCJdLCJhdXRoX3RpbWUiOiIyMDI0LTAxLTI0VDAwOjM4OjI3Ljc4NjI2MDg0OFoifQ",
-            "0z9gpqJIeISaqdQkhzl_Jj8Fi0yepYDD_5MvMqgB3bQ"
-        ];
+            "0z9gpqJIeISaqdQkhzl_Jj8Fi0yepYDD_5MvMqgB3bQ"];
 
         for i in input.iter() {
             assert!(Base64Str::is_base64(i));

@@ -44,14 +44,12 @@ mod test {
 
     #[test]
     fn try_from_test() {
-        let emails = vec![
-            "root@localhost.com",
+        let emails = ["root@localhost.com",
             "roo123@localhost.com",
             "root@admin.localhost.org",
             "root+admin@email.localhost.net",
             "r00!/admin@localhost.127.0.0.1",
-            "Aryanna.Hodkiewicz@yahoo.com"
-        ];
+            "Aryanna.Hodkiewicz@yahoo.com"];
 
         for email in emails.iter() {
             let x = Email::try_from(*email);

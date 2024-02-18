@@ -16,9 +16,9 @@ impl From<&[u8]> for Sha256Hash {
     }
 }
 
-impl Into<Vec<u8>> for Sha256Hash {
-    fn into(self) -> Vec<u8> {
-        self._hash
+impl From<Sha256Hash> for Vec<u8> {
+    fn from(val: Sha256Hash) -> Self {
+        val._hash
     }
 }
 

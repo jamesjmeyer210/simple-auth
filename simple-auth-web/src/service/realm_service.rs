@@ -83,7 +83,7 @@ impl <'r>RealmService<'r> {
 
 #[cfg(test)]
 mod test {
-    use simple_auth_crud::crud::RealmCrud;
+    
     use simple_auth_crud::DbContext;
     use crate::di::{ServiceFactory, TransientFactory};
     use crate::service::RealmService;
@@ -95,6 +95,6 @@ mod test {
         let factory = ServiceFactory::new()
             .add_singleton(db);
 
-        let service: RealmService = factory.get_transient();
+        let _service: RealmService = factory.get_transient();
     }
 }

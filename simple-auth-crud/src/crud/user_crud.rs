@@ -7,7 +7,7 @@ use simple_auth_model::uuid::Uuid;
 use crate::abs::join_table::JoinTable;
 use crate::abs::table::Table;
 use crate::crypto;
-use crate::crypto::{Encrypted, Secret, SecretStore, Sha256Hash};
+use crate::crypto::{Encrypted, SecretStore, Sha256Hash};
 use crate::db::DbContext;
 use crate::entity::{ContactInfoEntity, RealmEntity, RoleEntity, UserEntity};
 use crate::error::CrudError;
@@ -31,7 +31,7 @@ impl <'r>From<&DbContext<'r>> for UserCrud<'r> {
 }
 
 impl <'r>UserCrud<'r> {
-    pub async fn add<'u>(&self, user: &'u User, secret_store: &SecretStore) -> Result<&'u User,sqlx::Error> {
+    pub async fn add<'u>(&self, user: &'u User, _secret_store: &SecretStore) -> Result<&'u User,sqlx::Error> {
         let realms: Vec<&String> = user.realms.iter().map(|x|&x.name).collect();
         let roles: Vec<&String> = user.roles.iter().map(|x|&x.name).collect();
         let entity = UserEntity::from(user);
@@ -39,17 +39,17 @@ impl <'r>UserCrud<'r> {
         let c = self.users.add(&entity).await?;
         log::debug!("Added {} user", c);
 
-        if realms.len() > 0 {
+        if !realms.is_empty() {
             let c = self.realms.add_realms_to_user(&entity.id, &realms).await?;
             log::debug!("Added {} realms to user {}", c, &entity.name);
         }
 
-        if roles.len() > 0 {
+        if !roles.is_empty() {
             let c = self.roles.add_roles_to_user(&entity.id, &roles).await?;
             log::debug!("Added {} roles to user {}", c, &entity.name);
         }
 
-        if user.contact_info.len() == 0 {
+        if user.contact_info.is_empty() {
             return Ok(user);
         }
 
@@ -94,7 +94,7 @@ impl <'r>UserCrud<'r> {
         log::debug!("Retrieving full user by name: \"{}\"", name);
 
         let entity: UserEntity = self.users.get_by_name(name).await?;
-        if !entity.password.is_some() {
+        if entity.password.is_none() {
             return Err(CrudError::ValueIsNone);
         }
 
@@ -174,7 +174,7 @@ mod test {
     #[sqlx::test]
     async  fn get_full_by_name_returns_user() {
         let db = DbContext::in_memory().await.unwrap();
-        let user = db.init_default_unchecked().await;
+        let _user = db.init_default_unchecked().await;
 
         let crud = db.get_crud::<UserCrud>();
         let full_user = crud.get_full_by_name(

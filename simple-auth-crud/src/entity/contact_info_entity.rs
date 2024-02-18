@@ -32,7 +32,7 @@ impl ContactInfoEntity {
     pub fn new(contact: &ContactInfo, user_id: &Uuid) -> Self
     {
         Self {
-            user_id: user_id.clone(),
+            user_id: *user_id,
             label: contact.label.clone(),
             enc: vec![],
             hash: vec![],

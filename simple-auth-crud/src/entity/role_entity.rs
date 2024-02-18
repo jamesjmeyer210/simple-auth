@@ -23,13 +23,13 @@ impl From<&Role> for RoleEntity {
     }
 }
 
-impl Into<Role> for RoleEntity {
-    fn into(self) -> Role {
+impl From<RoleEntity> for Role {
+    fn from(val: RoleEntity) -> Self {
         Role {
-            name: self.name,
-            max: self.max,
-            created_on: self.created_on,
-            realm: self.realm_id,
+            name: val.name,
+            max: val.max,
+            created_on: val.created_on,
+            realm: val.realm_id,
         }
     }
 }

@@ -1,6 +1,6 @@
 use std::{fs, io};
-use serde::{Deserialize, Serialize};
-use crate::abs::AsJson;
+use serde::{Deserialize};
+
 use crate::config::database_config::{DatabaseConfig};
 use crate::config::security_config::SecurityConfig;
 use crate::config::server_config::ServerConfig;
@@ -62,13 +62,11 @@ mod test {
 
     #[test]
     fn config_deserializes() {
-        let files = vec![
-            "../test_data/model/config/001.json",
-            "../test_data/model/config/002.json"
-        ];
+        let files = ["../test_data/model/config/001.json",
+            "../test_data/model/config/002.json"];
 
         for file in files.iter() {
-            let config = Config::load(*file);
+            let config = Config::load(file);
             assert!(config.is_ok())
         }
     }
