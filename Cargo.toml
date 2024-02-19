@@ -3,5 +3,7 @@ resolver = "2"
 members = [
   "simple-auth-web",
   "simple-auth-crud",
-  "simple-auth-model"
-, "simple-auth-crypto"]
+  "simple-auth-model",
+  "simple-auth-crypto",
+  "simple-auth-error"
+]
