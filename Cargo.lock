@@ -1888,7 +1888,10 @@ dependencies = [
 name = "simple-auth-crypto"
 version = "0.1.0"
 dependencies = [
+ "aes-gcm",
+ "base64",
  "openssl",
+ "sha2",
 ]
 
 [[package]]
