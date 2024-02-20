@@ -26,14 +26,14 @@ impl<T> Hash<T> where T: Hasher
 {
     fn empty() -> Self {
         Self {
-            salt: vec![0u8;T::SALT_LEN],
+            salt: vec![0u8; T::SALT_LEN],
             hash: vec![0u8;T::HASH_LEN],
             _phantom: PhantomData::default()
         }
     }
 
     fn as_bytes(&self) -> &[u8] {
-        self.hash.as_slice()
+        self.hash.as_ref()
     }
 
     fn len(&self) -> usize {

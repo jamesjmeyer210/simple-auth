@@ -16,16 +16,6 @@ impl Argon2 {
 
         h.salt.copy_from_slice(salt);
         h
-
-        /*let argon2 = argon2::Argon2::default();
-        let mut hash = [0u8;Self::HASH_LEN];
-        argon2.hash_password_into(digest, &salt, &mut hash).unwrap();
-
-        Hash {
-            salt: salt.to_vec(),
-            hash: hash.to_vec(),
-            _phantom: PhantomData::default()
-        }*/
     }
 }
 
@@ -42,5 +32,18 @@ impl Hasher for Argon2 {
     fn verify(src: &Hash<Self>, digest: &[u8]) -> bool {
         let other = Self::hash(src.salt.as_slice(), digest);
         src.hash == other.hash
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Hasher;
+    use super::Argon2;
+
+    #[test]
+    fn verify_returns_true() {
+        let d = b"Hello SHA256!";
+        let x = Hasher::hash(d);
+        assert!(Argon2::verify(&x, d));
     }
 }

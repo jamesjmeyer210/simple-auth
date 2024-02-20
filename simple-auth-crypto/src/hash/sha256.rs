@@ -24,3 +24,16 @@ impl Hasher for Sha256 {
         src.hash == other.hash
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::Hasher;
+    use super::Sha256;
+
+    #[test]
+    fn verify_returns_true() {
+        let d = b"Hello SHA256!";
+        let x = Sha256::hash(d);
+        assert!(Sha256::verify(&x, d));
+    }
+}
