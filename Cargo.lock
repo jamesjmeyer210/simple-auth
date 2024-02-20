@@ -1892,6 +1892,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple-auth-error"
+version = "0.1.0"
+
+[[package]]
 name = "simple-auth-model"
 version = "0.1.0"
 dependencies = [
