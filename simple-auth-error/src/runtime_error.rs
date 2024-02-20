@@ -19,20 +19,6 @@ struct InnerError {
     error: Box<dyn Error>,
 }
 
-impl Display for RuntimeError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        if self.inner.is_some() {
-            let err = self.get_inner().unwrap();
-            write!(f, "{}", err)?;
-        }
-        Ok(())
-    }
-}
-
-impl Error for RuntimeError {
-
-}
-
 impl RuntimeError {
     pub fn new(file: &'static str, line: u32, error_kind: ErrorKind) -> Self {
         Self {
@@ -97,17 +83,31 @@ impl RuntimeError {
     }
 }
 
-macro_rules! error {
-    () => { RuntimeError::new(file!(), line!(), ErrorKind::Unknown) };
+impl Display for RuntimeError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}: {:?}: {} {}", self.file, self.line, self.kind, self.title, self.message)?;
+
+        if self.inner.is_some() {
+            let err = self.get_inner().unwrap();
+            write!(f, "{}", err)?;
+        }
+        Ok(())
+    }
+}
+
+impl Error for RuntimeError {}
+
+macro_rules! error_new {
+    () => { RuntimeError::new(file!(), line!(), ErrorKind::Undefined) };
     ($kind:expr) => { RuntimeError::new(file!(), line!(), $kind) };
 }
 
 macro_rules! error_from {
     ($error:expr) => {
-        RuntimeError::new(file!(), line!(), ErrorKind::Unknown).with_error($error)
+        RuntimeError::new(file!(), line!(), ErrorKind::Undefined).with_error($error)
     };
     ($error:expr, $kind:expr) => {
-        error!($kind).with_error($error)
+        error_new!($kind).with_error($error)
     };
 }
 
@@ -120,7 +120,7 @@ mod test {
     #[test]
     fn runtime_error_compiles(){
         let error = RuntimeError {
-            kind: ErrorKind::Unknown,
+            kind: ErrorKind::Undefined,
             title: "Some error",
             message: "A description",
             file: file!(),
@@ -130,13 +130,13 @@ mod test {
         assert_eq!(line!() - 3, error.line);
         assert_eq!(file!(), error.file);
 
-        let error = error!();
+        let error = error_new!();
         assert_eq!(line!() - 1, error.line);
 
-        let error = error!().with_title("Some error");
+        let error = error_new!().with_title("Some error");
         assert_eq!("Some error", error.title);
 
-        let error = error!(ErrorKind::InvalidArgument).with_message("Another description");
+        let error = error_new!(ErrorKind::InvalidArgument).with_message("Another description");
         assert_eq!("Another description", error.message);
     }
 

@@ -1,18 +1,30 @@
+/// The kind of error
 #[derive(Debug)]
 pub enum ErrorKind {
+    /// There error is not defined
+    Undefined,
+    /// The operation was cancelled
     Cancelled,
-    Unknown,
+    /// The argument was invalid (400)
     InvalidArgument,
-    DeadlineExceeded,
+    /// Authentication is required to perform this action (401)
+    Unauthorized,
+    /// The permissions to perform the operation or access the resource are not sufficient (403)
+    Forbidden,
+    /// The resource was not found (404)
     NotFound,
+    DeadlineExceeded,
     AlreadyExists,
-    PermissionDenied,
     ResourceExhausted,
     FailedPrecondition,
     Aborted,
     OutOfRange,
-    Unimplemented,
+    /// An error internal to the application occurred (500)
     Internal,
+    /// The operation cannot be performed because it does not have an implementation (501)
+    Unimplemented,
+    /// The resource is not available for the required action (503)
     Unavailable,
     DataLoss,
+    Unknown,
 }
