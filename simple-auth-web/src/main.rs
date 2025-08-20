@@ -14,7 +14,7 @@ use simple_auth_web::middleware::SimpleAuthMiddleware;
 
 use simple_auth_web::startup::Startup;
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
 
     let config = Startup::load_config("appconfig.dev.json")?;

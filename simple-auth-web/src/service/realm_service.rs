@@ -88,7 +88,7 @@ mod test {
     use crate::di::{ServiceFactory, TransientFactory};
     use crate::service::RealmService;
 
-    #[actix_rt::test]
+    #[tokio::test]
     async fn from_compiles(){
         let db = DbContext::in_memory().await.unwrap();
 
