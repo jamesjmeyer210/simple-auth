@@ -5,5 +5,4 @@ members = [
   "simple-auth-crud",
   "simple-auth-model",
   "simple-auth-crypto",
-  "simple-auth-error"
-]
+  "simple-auth-error"]
